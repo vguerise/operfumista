@@ -6,7 +6,6 @@
   <title>O Perfumista — Mapa de Coleção Perfeita</title>
 
   <style>
-    /* Base do seu Mapa (mesmo look & feel) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
@@ -14,11 +13,12 @@
       background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
       padding: 20px;
       min-height: 100vh;
+      color: white;
     }
 
     .container { max-width: 1000px; margin: 0 auto; }
 
-    header { text-align: center; color: white; margin-bottom: 30px; }
+    header { text-align: center; margin-bottom: 30px; }
 
     h1 {
       font-size: 2.2em;
@@ -37,7 +37,9 @@
       padding: 25px;
       position: relative;
       overflow: hidden;
+      margin-top: 20px;
     }
+
     .card::before {
       content: '';
       position: absolute;
@@ -53,6 +55,27 @@
       text-align: center;
     }
 
+    .input {
+      width: 100%;
+      padding: 12px 12px;
+      font-size: 1em;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      color: white;
+      outline: none;
+      margin-top: 10px;
+    }
+
+    .input:focus { border-color: #d4af37; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
     .analyze-btn {
       width: 100%;
       padding: 15px;
@@ -65,26 +88,168 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .analyze-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
     }
 
-    .row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 12px; }
-
-    .input {
-      width: 100%;
-      padding: 12px 12px;
-      font-size: 1em;
-      background: rgba(0, 0, 0, 0.3);
-      border: 2px solid rgba(212, 175, 55, 0.3);
-      border-radius: 10px;
-      color: white;
-      outline: none;
-    }
-    .input:focus { border-color: #d4af37; }
-
     .small-btn {
       padding: 12px 14px;
       font-weight: 700;
-      background: rgba(212
+      background: rgba(212, 175, 55, 0.18);
+      border: 2px solid rgba(212, 175, 55, 0.35);
+      color: #f4e5b1;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .small-btn:hover { border-color: #d4af37; transform: translateY(-1px); }
+
+    .chat {
+      margin-top: 18px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 12px;
+      padding: 14px;
+      max-height: 55vh;
+      overflow: auto;
+    }
+
+    .msg {
+      padding: 12px 12px;
+      border-radius: 12px;
+      margin: 10px 0;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg.user {
+      background: rgba(100, 150, 255, 0.10);
+      border: 1px solid rgba(100, 150, 255, 0.25);
+      color: #d6e6ff;
+    }
+
+    .msg.bot {
+      background: rgba(212, 175, 55, 0.10);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      color: #fff;
+    }
+
+    .hint {
+      color: #aaa;
+      font-size: 0.95em;
+      margin-top: 10px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 1.7em; }
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>O PERFUMISTA</h1>
+      <p class="subtitle">Versão hospedada no GitHub Pages (pronta para iframe).</p>
+    </header>
+
+    <h2 class="section-title">Fale com o Perfumista</h2>
+
+    <div class="card">
+      <p style="color:#ccc; line-height:1.7; margin-bottom:12px;">
+        Cole aqui o texto do diagnóstico (ou escreva sua dúvida).
+      </p>
+
+      <textarea id="prompt" class="input" rows="6"
+        placeholder="Ex: Total de perfumes: 4 | Clima: quente | Trabalho: fechado | Famílias dominantes..."></textarea>
+
+      <div class="row">
+        <button class="analyze-btn" id="sendBtn">🔮 Gerar sugestões</button>
+        <button class="small-btn" id="clearBtn">Limpar</button>
+      </div>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="hint" id="status">
+        (Modo teste) Sem endpoint ainda, ele vai responder com uma mensagem demo.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ENDPOINT_URL = "COLE_AQUI_SEU_ENDPOINT"; // depois a gente configura
+
+    const chat = document.getElementById("chat");
+    const promptEl = document.getElementById("prompt");
+    const sendBtn = document.getElementById("sendBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const statusEl = document.getElementById("status");
+
+    function addMsg(text, who) {
+      const div = document.createElement("div");
+      div.className = "msg " + who;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    clearBtn.addEventListener("click", () => {
+      promptEl.value = "";
+      chat.innerHTML = "";
+      statusEl.textContent = "Pronto.";
+    });
+
+    sendBtn.addEventListener("click", async () => {
+      const prompt = (promptEl.value || "").trim();
+      if (!prompt) {
+        statusEl.textContent = "Escreva ou cole algo no campo acima.";
+        return;
+      }
+
+      addMsg(prompt, "user");
+      statusEl.textContent = "Consultando o Perfumista…";
+
+      if (!ENDPOINT_URL || ENDPOINT_URL.includes("COLE_AQUI_SEU_ENDPOINT")) {
+        addMsg(
+`(DEMO) Sugestão rápida:
+• Preencha 1 lacuna funcional primeiro (Calor/Trabalho/Noite/Assinatura)
+• Evite comprar mais da família dominante agora
+• Diga seu orçamento + clima + ambiente e eu te passo 3 opções certeiras`,
+          "bot"
+        );
+        statusEl.textContent = "⚠️ Modo demo (endpoint não configurado).";
+        return;
+      }
+
+      try {
+        sendBtn.disabled = true;
+
+        const r = await fetch(ENDPOINT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const data = await r.json();
+
+        addMsg(data?.text || "(sem resposta)", "bot");
+        statusEl.textContent = "Pronto.";
+      } catch (e) {
+        addMsg("Erro ao consultar o agente: " + String(e), "bot");
+        statusEl.textContent = "Erro.";
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
