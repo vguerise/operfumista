@@ -158,7 +158,7 @@
   <div class="container">
     <header>
       <h1>O PERFUMISTA</h1>
-      <p class="subtitle">Versão hospedada no GitHub Pages (pronta para iframe).</p>
+      <p class="subtitle">IA ativa — conectada ao seu servidor no Vercel.</p>
     </header>
 
     <h2 class="section-title">Fale com o Perfumista</h2>
@@ -178,14 +178,12 @@
 
       <div class="chat" id="chat"></div>
 
-      <div class="hint" id="status">
-        (Modo teste) Sem endpoint ainda, ele vai responder com uma mensagem demo.
-      </div>
+      <div class="hint" id="status">Pronto.</div>
     </div>
   </div>
 
   <script>
-    const ENDPOINT_URL = "COLE_AQUI_SEU_ENDPOINT"; // depois a gente configura
+    const ENDPOINT_URL = "https://operfumista-api.vercel.app/api/perfumista";
 
     const chat = document.getElementById("chat");
     const promptEl = document.getElementById("prompt");
@@ -216,18 +214,6 @@
 
       addMsg(prompt, "user");
       statusEl.textContent = "Consultando o Perfumista…";
-
-      if (!ENDPOINT_URL || ENDPOINT_URL.includes("COLE_AQUI_SEU_ENDPOINT")) {
-        addMsg(
-`(DEMO) Sugestão rápida:
-• Preencha 1 lacuna funcional primeiro (Calor/Trabalho/Noite/Assinatura)
-• Evite comprar mais da família dominante agora
-• Diga seu orçamento + clima + ambiente e eu te passo 3 opções certeiras`,
-          "bot"
-        );
-        statusEl.textContent = "⚠️ Modo demo (endpoint não configurado).";
-        return;
-      }
 
       try {
         sendBtn.disabled = true;
