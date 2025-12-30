@@ -183,8 +183,24 @@
   </div>
 
   <script>
+    // === CONFIG ===
     const ENDPOINT_URL = "https://operfumista-api.vercel.app/api/perfumista";
 
+    // Segurança: só aceitar/mandar mensagens para o seu domínio do GitHub Pages
+    const MAPA_ALLOWED_ORIGIN = "https://vguerise.github.io";
+
+    function notifyParent(type, payload = {}) {
+      // Se não estiver dentro de um iframe, não precisa mandar nada
+      if (window.parent === window) return;
+      try {
+        window.parent.postMessage(
+          { source: "operfumista", type, ...payload },
+          MAPA_ALLOWED_ORIGIN
+        );
+      } catch (e) {}
+    }
+
+    // === UI refs ===
     const chat = document.getElementById("chat");
     const promptEl = document.getElementById("prompt");
     const sendBtn = document.getElementById("sendBtn");
@@ -199,21 +215,22 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
+    function setStatus(t) {
+      statusEl.textContent = t;
+    }
+
     clearBtn.addEventListener("click", () => {
       promptEl.value = "";
       chat.innerHTML = "";
-      statusEl.textContent = "Pronto.";
+      setStatus("Pronto.");
     });
 
-    sendBtn.addEventListener("click", async () => {
-      const prompt = (promptEl.value || "").trim();
-      if (!prompt) {
-        statusEl.textContent = "Escreva ou cole algo no campo acima.";
-        return;
-      }
-
+    async function runPerfumista(prompt) {
       addMsg(prompt, "user");
-      statusEl.textContent = "Consultando o Perfumista…";
+      setStatus("Consultando o Perfumista…");
+
+      // avisa o Mapa que começou
+      notifyParent("loading", { value: true });
 
       try {
         sendBtn.disabled = true;
@@ -224,17 +241,63 @@
           body: JSON.stringify({ prompt })
         });
 
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        const data = await r.json();
+        const data = await r.json().catch(() => ({}));
 
-        addMsg(data?.text || "(sem resposta)", "bot");
-        statusEl.textContent = "Pronto.";
+        if (!r.ok) {
+          const msg = data?.error ? String(data.error) : ("HTTP " + r.status);
+          throw new Error(msg);
+        }
+
+        const text = (data?.text || "").trim();
+        if (!text) {
+          throw new Error("Resposta vazia da API.");
+        }
+
+        addMsg(text, "bot");
+        setStatus("Pronto.");
+
+        // avisa o Mapa que terminou
+        notifyParent("done", { value: true });
       } catch (e) {
-        addMsg("Erro ao consultar o agente: " + String(e), "bot");
-        statusEl.textContent = "Erro.";
+        addMsg("Erro ao consultar o agente: " + String(e?.message || e), "bot");
+        setStatus("Erro.");
+
+        // avisa o Mapa do erro
+        notifyParent("error", { message: String(e?.message || e) });
       } finally {
         sendBtn.disabled = false;
+
+        // avisa o Mapa que não está mais carregando
+        notifyParent("loading", { value: false });
       }
+    }
+
+    sendBtn.addEventListener("click", async () => {
+      const prompt = (promptEl.value || "").trim();
+      if (!prompt) {
+        setStatus("Escreva ou cole algo no campo acima.");
+        return;
+      }
+      await runPerfumista(prompt);
+    });
+
+    // === Receber comando do Mapa via iframe ===
+    window.addEventListener("message", async (event) => {
+      if (event.origin !== MAPA_ALLOWED_ORIGIN) return;
+
+      const data = event.data || {};
+      if (data.source !== "mapa" || data.type !== "set_and_run") return;
+
+      const texto = (data.text || "").trim();
+      if (!texto) return;
+
+      // Preenche e executa automaticamente
+      promptEl.value = texto;
+
+      // limpa conversa anterior (opcional)
+      chat.innerHTML = "";
+
+      await runPerfumista(texto);
     });
   </script>
 </body>
