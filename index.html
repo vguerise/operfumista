@@ -1,353 +1,168 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>O Perfumista</title>
-  <style>
-    :root{
-      --gold:#d4af37;
-      --bg:#0b0b0c;
-      --card:rgba(0,0,0,.32);
-      --stroke:rgba(212,175,55,.18);
-      --stroke2:rgba(212,175,55,.28);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --shadow:0 18px 50px rgba(0,0,0,.45);
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica;
-      color:var(--text);
-      background:
-        radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,.18), transparent 55%),
-        radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,.10), transparent 55%),
-        linear-gradient(180deg, #0b0b0c 0%, #0a0a0a 100%);
-      min-height:100vh;
-      padding:34px 16px 28px;
-    }
-    .container{max-width:980px;margin:0 auto}
-    header{text-align:center;margin-bottom:18px}
-    h1{
-      margin:0;
-      font-size:2.2rem;
-      letter-spacing:2px;
-      color:var(--gold);
-      font-weight:900;
-    }
-    .subtitle{
-      margin:10px 0 0;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.4;
-    }
-    .section-title{
-      margin:18px 0 10px;
-      font-size:1.4rem;
-      font-weight:900;
-      color:#fff;
-      text-align:center;
-    }
-    .card{
-      border:1px solid var(--stroke);
-      background:var(--card);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      padding:18px 16px;
-    }
+<meta charset="UTF-8">
+<title>O Perfumista</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    /* Cards (resposta) */
-    .cards{margin-top:14px;display:grid;gap:14px}
-    .banner{
-      border:1px solid var(--stroke2);
-      background:rgba(0,0,0,.28);
-      border-radius:16px;
-      padding:14px 16px;
-    }
-    .banner h3{margin:0;font-size:1.08rem;letter-spacing:.2px}
-    .banner p{margin:6px 0 0;color:var(--muted);line-height:1.45}
-
-    .recCard{
-      position:relative;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.30);
-      border-radius:18px;
-      padding:18px 16px 16px 70px;
-      box-shadow:0 12px 40px rgba(0,0,0,.35);
-    }
-    .badgeNum{
-      position:absolute;left:16px;top:18px;
-      width:40px;height:40px;border-radius:999px;
-      background:rgba(212,175,55,.22);
-      border:1px solid rgba(212,175,55,.35);
-      display:flex;align-items:center;justify-content:center;
-      font-weight:900;color:#fff;
-    }
-    .recTitle{font-size:1.15rem;font-weight:900;margin:0 0 8px}
-    .metaLine{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.06);
-      font-size:.92rem;color:rgba(255,255,255,.85)
-    }
-    .recBody{color:rgba(255,255,255,.78);line-height:1.55}
-    .recBody b{color:rgba(255,255,255,.92)}
-
-    .divider{border:0;border-top:1px solid rgba(255,255,255,.08);margin:16px 0 10px}
-
-    /* Área nova pergunta */
-    .askTitle{margin-top:4px;font-size:1.05rem;font-weight:900;display:flex;align-items:center;gap:10px}
-    .askHelp{color:var(--muted);margin:8px 0 10px;line-height:1.45}
-    textarea{
-      width:100%;
-      min-height:120px;
-      resize:vertical;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.35);
-      color:var(--text);
-      padding:14px 14px;
-      font-size:1rem;
-      outline:none;
-    }
-    textarea::placeholder{color:rgba(255,255,255,.38)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    button{
-      border:0;cursor:pointer;
-      border-radius:14px;
-      padding:12px 16px;
-      font-weight:900;
-      font-size:1rem;
-    }
-    .primary{
-      background:linear-gradient(90deg, rgba(212,175,55,.95), rgba(255,238,170,.92));
-      color:#151515;
-      min-width:240px;
-    }
-    .ghost{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      color:rgba(255,255,255,.86);
-    }
-    .hint{margin-top:10px;color:rgba(255,255,255,.45);font-size:.92rem;line-height:1.35}
-  </style>
+<style>
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:#0b0b0c;
+  color:white;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:24px;
+}
+h1{
+  color:#d4af37;
+  letter-spacing:3px;
+  text-align:center;
+}
+.card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(212,175,55,.3);
+  border-radius:16px;
+  padding:20px;
+  margin-top:20px;
+}
+textarea{
+  width:100%;
+  min-height:120px;
+  background:#000;
+  border:1px solid rgba(255,255,255,.2);
+  color:white;
+  padding:12px;
+  border-radius:12px;
+}
+button{
+  margin-top:10px;
+  padding:12px 16px;
+  font-weight:700;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+.primary{
+  background:#d4af37;
+  color:black;
+}
+#status{
+  margin-bottom:10px;
+  opacity:.7;
+}
+.rec{
+  border:1px solid rgba(255,255,255,.15);
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <h1>O PERFUMISTA</h1>
-      <p class="subtitle">Cards de recomendações (pronto para iframe no Mapa).</p>
-    </header>
+<div class="container">
+  <h1>O PERFUMISTA</h1>
 
-    <h2 class="section-title">Sugestões do Perfumista</h2>
+  <div class="card">
+    <div id="status">Pronto.</div>
+    <div id="respostas"></div>
 
-    <div class="card">
-      <div id="status" class="subtitle" style="margin-bottom:10px;">Pronto.</div>
-
-      <div id="cards" class="cards"></div>
-
-      <hr class="divider" />
-
-      <div class="askTitle">✍️ Quer mais alguma sugestão?</div>
-      <div class="askHelp">
-        Digite a situação, clima, ambiente e orçamento. Ex.: <i>“Noite, clima quente, evento casual, até R$600; quero algo amadeirado sem doce.”</i>
-      </div>
-
-      <textarea id="prompt" placeholder="Quer mais alguma sugestão? Digite a situação, clima, ambiente e orçamento!"></textarea>
-
-      <div class="row">
-        <button class="primary" id="sendBtn">✨ Gerar sugestões</button>
-        <button class="ghost" id="clearBtn">Limpar</button>
-      </div>
-
-      <div class="hint">Dentro do Mapa, o diagnóstico chega automaticamente e gera os 3 cards iniciais.</div>
-    </div>
+    <textarea id="prompt" placeholder="Quer mais alguma recomendação?"></textarea>
+    <button class="primary" id="sendBtn">Gerar</button>
   </div>
+</div>
 
-  <script>
-    const ENDPOINT_URL = "https://operfumista-api.vercel.app/api/perfumista";
-    const MAPA_ALLOWED_ORIGIN = "https://vguerise.github.io";
+<script>
+const API_URL = "https://operfumista-api.vercel.app/api/perfumista";
+const MAPA_ORIGIN = "https://vguerise.github.io";
 
-    let contextoMapa = ""; // invisível (só pra orientar a IA)
+let contextoMapa = "";
 
-    const cardsEl = document.getElementById("cards");
-    const promptEl = document.getElementById("prompt");
-    const sendBtn = document.getElementById("sendBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const statusEl = document.getElementById("status");
+const statusEl = document.getElementById("status");
+const respostasEl = document.getElementById("respostas");
+const promptEl = document.getElementById("prompt");
+const sendBtn = document.getElementById("sendBtn");
 
-    function setStatus(t){ statusEl.textContent = t || ""; sendHeightToParent(); }
-    function escapeHtml(s){
-      return String(s||"")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-    }
+function setStatus(t){
+  statusEl.textContent = t;
+  enviarAltura();
+}
 
-    function notifyParent(type, payload = {}) {
-      if (window.parent === window) return;
-      try {
-        window.parent.postMessage({ source:"operfumista", type, ...payload }, MAPA_ALLOWED_ORIGIN);
-      } catch (e) {}
-    }
+function enviarAltura(){
+  if(window.parent !== window){
+    const h = document.body.scrollHeight;
+    window.parent.postMessage({ source:"operfumista", type:"height", height:h }, MAPA_ORIGIN);
+  }
+}
 
-    let _heightTicking = false;
-    function sendHeightToParent(){
-      if (_heightTicking) return;
-      _heightTicking = true;
-      requestAnimationFrame(() => {
-        _heightTicking = false;
-        const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-        notifyParent("height", { height:h });
-      });
-    }
+async function chamarAPI(texto){
+  setStatus("Consultando o Perfumista...");
+  sendBtn.disabled = true;
 
-    window.addEventListener("load", () => {
-      sendHeightToParent();
-      setTimeout(sendHeightToParent, 200);
-      setTimeout(sendHeightToParent, 600);
+  try{
+    const resp = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({
+        prompt: texto
+      })
     });
 
-    try{
-      const ro = new ResizeObserver(() => sendHeightToParent());
-      ro.observe(document.body);
-    }catch(e){
-      setInterval(sendHeightToParent, 800);
+    const data = await resp.json();
+
+    if(!resp.ok){
+      throw new Error(data.error || "Erro HTTP " + resp.status);
     }
 
-    function renderBanner(titulo, subtitulo){
+    renderizar(data);
+    setStatus("Pronto.");
+
+  }catch(err){
+    respostasEl.innerHTML = `<div class="rec">Erro: ${err.message}</div>`;
+    setStatus("Erro.");
+  }
+
+  sendBtn.disabled = false;
+  enviarAltura();
+}
+
+function renderizar(data){
+  respostasEl.innerHTML = "";
+
+  if(Array.isArray(data.recomendacoes)){
+    data.recomendacoes.forEach(r=>{
       const div = document.createElement("div");
-      div.className = "banner";
-      div.innerHTML = `
-        <h3>${escapeHtml(titulo || "🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO")}</h3>
-        <p>${escapeHtml(subtitulo || "Baseado no seu contexto e lacunas identificadas.")}</p>
-      `;
-      cardsEl.appendChild(div);
-    }
-
-    function renderRecCard(rec, idx){
-      const nome   = rec?.nome || "Recomendação";
-      const familia= rec?.familia || "";
-      const faixa  = rec?.faixa_preco || "";
-      const porQue = rec?.por_que || "";
-      const quando = rec?.quando_usar || "";
-
-      const div = document.createElement("div");
-      div.className = "recCard";
-      div.innerHTML = `
-        <div class="badgeNum">${idx+1}</div>
-        <div class="recTitle">${escapeHtml(nome)}</div>
-
-        <div class="metaLine">
-          ${familia ? `<span class="pill">🍋 <b>${escapeHtml(familia)}</b></span>` : ""}
-          ${faixa ? `<span class="pill">💰 <b>${escapeHtml(faixa)}</b></span>` : ""}
-        </div>
-
-        <div class="recBody">
-          ${porQue ? `<div><b>Por que combina:</b> ${escapeHtml(porQue)}</div>` : ""}
-          ${quando ? `<div style="margin-top:8px;"><b>Quando usar:</b> ${escapeHtml(quando)}</div>` : ""}
-        </div>
-      `;
-      cardsEl.appendChild(div);
-    }
-
-    function renderFromJson(data){
-      cardsEl.innerHTML = "";
-
-      renderBanner(data?.titulo, data?.subtitulo);
-
-      const recs = Array.isArray(data?.recomendacoes) ? data.recomendacoes : [];
-      if (recs.length){
-        recs.slice(0,3).forEach((r,i) => renderRecCard(r,i));
-      } else {
-        const div = document.createElement("div");
-        div.className = "recCard";
-        div.innerHTML = `
-          <div class="badgeNum">!</div>
-          <div class="recTitle">Resposta do Perfumista</div>
-          <div class="recBody">${escapeHtml(data?.raw || "Não veio conteúdo para renderizar.")}</div>
-        `;
-        cardsEl.appendChild(div);
-      }
-
-      setStatus("Pronto.");
-      sendHeightToParent();
-    }
-
-    async function callPerfumista(texto){
-      setStatus("Consultando o Perfumista…");
-      notifyParent("loading", { value:true });
-      sendBtn.disabled = true;
-
-      try{
-        const r = await fetch(ENDPOINT_URL, {
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ diagnostico: texto })
-        });
-
-        const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data?.error ? String(data.error) : ("HTTP "+r.status));
-
-        renderFromJson(data);
-      }catch(e){
-        cardsEl.innerHTML = "";
-        const div = document.createElement("div");
-        div.className = "recCard";
-        div.innerHTML = `
-          <div class="badgeNum">!</div>
-          <div class="recTitle">Erro</div>
-          <div class="recBody">${escapeHtml(e?.message || String(e))}</div>
-        `;
-        cardsEl.appendChild(div);
-        setStatus("Erro.");
-      }finally{
-        sendBtn.disabled = false;
-        notifyParent("loading", { value:false });
-        sendHeightToParent();
-      }
-    }
-
-    // Nova pergunta: usa contexto do mapa por trás
-    sendBtn.addEventListener("click", async () => {
-      const pergunta = (promptEl.value || "").trim();
-      if (!pergunta){
-        setStatus("Digite sua situação no campo em branco.");
-        return;
-      }
-
-      const texto = contextoMapa
-        ? (contextoMapa + "\n\nPedido adicional do usuário: " + pergunta)
-        : pergunta;
-
-      await callPerfumista(texto);
-      promptEl.value = ""; // fica sempre limpo
+      div.className="rec";
+      div.innerHTML = `<b>${r.nome}</b><br>${r.por_que || ""}`;
+      respostasEl.appendChild(div);
     });
+  }else{
+    respostasEl.innerHTML = `<div class="rec">${JSON.stringify(data)}</div>`;
+  }
+}
 
-    clearBtn.addEventListener("click", () => {
-      promptEl.value = "";
-      cardsEl.innerHTML = "";
-      setStatus("Pronto.");
-      sendHeightToParent();
-    });
+sendBtn.onclick = ()=>{
+  const texto = promptEl.value.trim();
+  if(!texto) return;
+  const final = contextoMapa ? contextoMapa + "\n\n" + texto : texto;
+  chamarAPI(final);
+  promptEl.value="";
+};
 
-    // Recebe diagnóstico do Mapa e roda automaticamente
-    window.addEventListener("message", async (event) => {
-      if (event.origin !== MAPA_ALLOWED_ORIGIN) return;
+window.addEventListener("message", e=>{
+  if(e.origin !== MAPA_ORIGIN) return;
 
-      const data = event?.data || {};
-      if (data.source !== "mapa" || data.type !== "set_and_run") return;
+  if(e.data?.source==="mapa" && e.data.type==="set_and_run"){
+    contextoMapa = e.data.text || "";
+    if(contextoMapa) chamarAPI(contextoMapa);
+  }
+});
 
-      const texto = (data.text || "").trim();
-      if (!texto) return;
-
-      contextoMapa = texto;
-      await callPerfumista(contextoMapa);
-      promptEl.value = "";
-    });
-  </script>
+window.onload = enviarAltura;
+</script>
 </body>
 </html>
