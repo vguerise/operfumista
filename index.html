@@ -108,8 +108,22 @@ function setStatus(t){
 }
 function resize(){
   if(window.parent!==window){
-    window.parent.postMessage({source:"operfumista",type:"height",height:document.body.scrollHeight},MAPA_ORIGIN);
+    window.parent.postMessage(
+      {source:"operfumista",type:"height",height:document.body.scrollHeight},
+      MAPA_ORIGIN
+    );
   }
+}
+
+/* 🟡 WARM-UP (NOVA FUNÇÃO) */
+function warmupPerfumista(){
+  try{
+    fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ diagnostico:"warmup", warmup:true })
+    }).catch(()=>{});
+  }catch(e){}
 }
 
 async function chamarIA(text){
@@ -164,7 +178,11 @@ window.addEventListener("message",e=>{
   }
 });
 
-window.onload=resize;
+/* 🟡 AQUI chamamos o warm-up (NOVA LINHA) */
+window.addEventListener("load", ()=>{
+  warmupPerfumista();
+  resize();
+});
 </script>
 </body>
 </html>
