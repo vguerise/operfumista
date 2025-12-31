@@ -9,11 +9,11 @@
 :root{
   --gold:#d4af37;
   --bg:#0b0b0c;
-  --card:rgba(0,0,0,.32);
-  --stroke:rgba(212,175,55,.18);
-  --stroke2:rgba(212,175,55,.28);
-  --text:rgba(255,255,255,.92);
-  --muted:rgba(255,255,255,.68);
+  --card:rgba(0,0,0,32);
+  --stroke:rgba(212,175,55,18);
+  --stroke2:rgba(212,175,55,28);
+  --text:rgba(255,255,255,92);
+  --muted:rgba(255,255,255,68);
 }
 *{box-sizing:border-box}
 body{
@@ -21,8 +21,8 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
   color:var(--text);
   background:
-    radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,.18), transparent 55%),
-    radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,.10), transparent 55%),
+    radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,18), transparent 55%),
+    radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,10), transparent 55%),
     linear-gradient(#0b0b0c,#0a0a0a);
   min-height:100vh;
   padding:28px 16px;
@@ -60,7 +60,7 @@ textarea{
   margin-top:12px;
   background:#000;
   color:white;
-  border:1px solid rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,15);
   border-radius:12px;
   padding:12px;
 }
@@ -116,6 +116,17 @@ function resize(){
   }
 }
 
+function notifyParent(type, extra = {}){
+  if(window.parent!==window){
+    try{
+      window.parent.postMessage(
+        Object.assign({source:"operfumista", type}, extra),
+        MAPA_ORIGIN
+      );
+    }catch(e){}
+  }
+}
+
 /* 🟡 WARM-UP (corrigido: não chama OpenAI) */
 function warmupPerfumista(){
   try{
@@ -125,6 +136,10 @@ function warmupPerfumista(){
 
 async function chamarIA(text){
   if(!text.trim()) return;
+
+  // avisa o mapa para mostrar/atualizar o popup de loading
+  notifyParent("loading");
+
   setStatus("Consultando o Perfumista…");
   try{
     const r = await fetch(API,{
@@ -137,9 +152,15 @@ async function chamarIA(text){
 
     render(data);
     setStatus("Pronto.");
+
+    // fecha o popup assim que a resposta estiver renderizada
+    notifyParent("done");
   }catch(e){
     cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
     setStatus("Erro.");
+
+    // garante que o popup não fique preso
+    notifyParent("error", { message: e.message });
   }
   resize();
 }
