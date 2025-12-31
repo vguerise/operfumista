@@ -1,486 +1,352 @@
-<!doctype html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>O Perfumista</title>
   <style>
     :root{
-      --bg:#121212;
-      --panel: rgba(0,0,0,.35);
-      --border: rgba(212,175,55,.25);
       --gold:#d4af37;
-      --gold2:#f4e5b1;
-      --text:#f2f2f2;
-      --muted:#b9b9b9;
-      --danger:#ff6b6b;
-      --blue: rgba(155,196,255,.95);
+      --bg:#0b0b0c;
+      --card:rgba(0,0,0,.32);
+      --stroke:rgba(212,175,55,.18);
+      --stroke2:rgba(212,175,55,.28);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --shadow:0 18px 50px rgba(0,0,0,.45);
+      --radius:18px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background: radial-gradient(1200px 700px at 50% 10%, rgba(212,175,55,.10), transparent 60%),
-                  linear-gradient(135deg, #2b2b2b 0%, #121212 60%);
-      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,.18), transparent 55%),
+        radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,.10), transparent 55%),
+        linear-gradient(180deg, #0b0b0c 0%, #0a0a0a 100%);
+      min-height:100vh;
+      padding:34px 16px 28px;
     }
-    .wrap{ max-width: 1020px; margin: 0 auto; padding: 22px 16px 28px; }
+    .container{max-width:980px;margin:0 auto}
+    header{text-align:center;margin-bottom:18px}
+    h1{
+      margin:0;
+      font-size:2.2rem;
+      letter-spacing:2px;
+      color:var(--gold);
+      font-weight:900;
+    }
+    .subtitle{
+      margin:10px 0 0;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.4;
+    }
+    .section-title{
+      margin:18px 0 10px;
+      font-size:1.4rem;
+      font-weight:900;
+      color:#fff;
+      text-align:center;
+    }
     .card{
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 18px 50px rgba(0,0,0,.45);
-      backdrop-filter: blur(6px);
-    }
-    .top{ display:flex; align-items:center; gap:14px; margin-bottom: 12px; }
-    .badge{
-      width:44px;height:44px;border-radius:12px;
-      display:flex;align-items:center;justify-content:center;
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
-      color:#111;font-weight:900;
-      box-shadow: 0 12px 30px rgba(212,175,55,.25);
-      flex:0 0 auto;
-    }
-    h1{ margin:0; font-size: 1.25rem; letter-spacing:.2px; }
-    .sub{ margin:4px 0 0; color: var(--muted); font-size:.92rem; line-height:1.35; }
-    .status{ margin: 10px 0 0; color: var(--muted); font-size: .92rem; min-height: 22px; }
-
-    .resultHeader{
-      margin-top: 14px;
-      border: 1px solid rgba(212,175,55,.22);
-      background: rgba(212,175,55,.08);
-      border-radius: 16px;
-      padding: 12px 14px;
-      display:none;
-    }
-    .resultHeader .title{
-      display:flex; align-items:center; gap:10px;
-      font-weight:900; letter-spacing:.2px;
-      color: var(--gold2);
-      margin:0 0 4px;
-    }
-    .resultHeader .desc{
-      margin:0;
-      color: rgba(242,242,242,.75);
-      font-size: .92rem;
+      border:1px solid var(--stroke);
+      background:var(--card);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:18px 16px;
     }
 
-    .cards{ margin-top: 14px; display:flex; flex-direction:column; gap:12px; }
+    /* Cards (resposta) */
+    .cards{margin-top:14px;display:grid;gap:14px}
+    .banner{
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.28);
+      border-radius:16px;
+      padding:14px 16px;
+    }
+    .banner h3{margin:0;font-size:1.08rem;letter-spacing:.2px}
+    .banner p{margin:6px 0 0;color:var(--muted);line-height:1.45}
+
     .recCard{
-      border: 1px solid rgba(212,175,55,.22);
-      background: rgba(0,0,0,.28);
-      border-radius: 16px;
-      padding: 14px;
+      position:relative;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.30);
+      border-radius:18px;
+      padding:18px 16px 16px 70px;
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
     }
-    .recTop{ display:flex; gap:12px; align-items:flex-start; }
-    .num{
-      width:38px;height:38px;border-radius:999px;
+    .badgeNum{
+      position:absolute;left:16px;top:18px;
+      width:40px;height:40px;border-radius:999px;
+      background:rgba(212,175,55,.22);
+      border:1px solid rgba(212,175,55,.35);
       display:flex;align-items:center;justify-content:center;
-      background: rgba(212,175,55,.16);
-      border: 1px solid rgba(212,175,55,.35);
-      color: var(--gold2);
-      font-weight:900;
-      flex:0 0 auto;
+      font-weight:900;color:#fff;
     }
-    .recName{ margin:0; font-size: 1.05rem; font-weight:900; color: var(--gold2); line-height: 1.2; }
-    .meta{ margin: 8px 0 0; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .recTitle{font-size:1.15rem;font-weight:900;margin:0 0 8px}
+    .metaLine{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 7px 10px; border-radius: 999px;
-      background: rgba(0,0,0,.25);
-      border: 1px solid rgba(255,255,255,.10);
-      color: rgba(242,242,242,.92);
-      font-size: .92rem;
-      white-space: nowrap;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      font-size:.92rem;color:rgba(255,255,255,.85)
     }
-    .pill b{ color: var(--blue); }
+    .recBody{color:rgba(255,255,255,.78);line-height:1.55}
+    .recBody b{color:rgba(255,255,255,.92)}
 
-    .body{
-      margin-top: 12px;
-      color: rgba(242,242,242,.92);
-      line-height:1.5;
-    }
-    .kv{ margin: 8px 0 0; }
-    .kv .k{ color: rgba(242,242,242,.70); font-weight:900; }
-    .kv .v{ color: rgba(242,242,242,.92); }
-    .kv p{ margin: 6px 0; }
+    .divider{border:0;border-top:1px solid rgba(255,255,255,.08);margin:16px 0 10px}
 
-    .err{
-      margin-top: 10px;
-      color: var(--danger);
-      font-weight:800;
-      white-space: pre-wrap;
-      display:none;
-    }
-
-    .ask{
-      margin-top: 18px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      padding-top: 14px;
-    }
-    .askHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom: 10px;
-    }
-    .askTitle{
-      margin:0;
-      font-weight:900;
-      letter-spacing:.2px;
-      font-size: 1rem;
-      color: var(--gold2);
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .askHint{
-      margin:0;
-      color: rgba(242,242,242,.72);
-      font-size: .92rem;
-      line-height: 1.35;
-    }
-
+    /* Área nova pergunta */
+    .askTitle{margin-top:4px;font-size:1.05rem;font-weight:900;display:flex;align-items:center;gap:10px}
+    .askHelp{color:var(--muted);margin:8px 0 10px;line-height:1.45}
     textarea{
       width:100%;
-      min-height: 110px;
-      resize: vertical;
-      background: rgba(0,0,0,.35);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 1rem;
-      outline: none;
+      min-height:120px;
+      resize:vertical;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.35);
+      color:var(--text);
+      padding:14px 14px;
+      font-size:1rem;
+      outline:none;
     }
-    textarea:focus{
-      border-color: rgba(212,175,55,.55);
-      box-shadow: 0 0 0 3px rgba(212,175,55,.12);
+    textarea::placeholder{color:rgba(255,255,255,.38)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{
+      border:0;cursor:pointer;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:900;
+      font-size:1rem;
     }
-    .row{ display:flex; gap:12px; flex-wrap:wrap; margin-top: 10px; }
-    .btn{
-      appearance:none; border:0; border-radius: 12px;
-      padding: 12px 16px;
-      font-weight:900; cursor:pointer;
-      transition: transform .15s ease, opacity .15s ease;
-      display:inline-flex; align-items:center; gap:10px;
-      user-select:none; white-space:nowrap;
+    .primary{
+      background:linear-gradient(90deg, rgba(212,175,55,.95), rgba(255,238,170,.92));
+      color:#151515;
+      min-width:240px;
     }
-    .btn:active{ transform: translateY(1px); }
-    .btn-primary{
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
-      color:#111;
-      box-shadow: 0 12px 30px rgba(212,175,55,.25);
+    .ghost{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:rgba(255,255,255,.86);
     }
-    .btn-ghost{
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.14);
-    }
-    .btn[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
+    .hint{margin-top:10px;color:rgba(255,255,255,.45);font-size:.92rem;line-height:1.35}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
+  <div class="container">
+    <header>
+      <h1>O PERFUMISTA</h1>
+      <p class="subtitle">Cards de recomendações (pronto para iframe no Mapa).</p>
+    </header>
+
+    <h2 class="section-title">Sugestões do Perfumista</h2>
+
     <div class="card">
-      <div class="top">
-        <div class="badge">🤖</div>
-        <div>
-          <h1>O Perfumista</h1>
-          <p class="sub">Recomendações em cards. Depois, peça mais sugestões no campo em branco.</p>
-        </div>
-      </div>
-
-      <div id="status" class="status">Pronto.</div>
-
-      <div id="resultHeader" class="resultHeader">
-        <div class="title">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
-        <p class="desc" id="resultSub">Baseado no seu contexto e lacunas identificadas.</p>
-      </div>
+      <div id="status" class="subtitle" style="margin-bottom:10px;">Pronto.</div>
 
       <div id="cards" class="cards"></div>
-      <div id="err" class="err"></div>
 
-      <div class="ask">
-        <div class="askHeader">
-          <p class="askTitle">✍️ Quer mais alguma sugestão?</p>
-          <button class="btn btn-ghost" id="clearBtn">Limpar</button>
-        </div>
-        <p class="askHint">Digite a situação, clima, ambiente e orçamento. Ex.: “Noite, clima quente, evento casual, até R$600; quero algo amadeirado sem doce”.</p>
+      <hr class="divider" />
 
-        <textarea
-          id="prompt"
-          placeholder="Quer mais alguma sugestão? Digite a situação, clima, ambiente e orçamento!"
-        ></textarea>
-
-        <div class="row">
-          <button class="btn btn-primary" id="sendBtn">✨ Gerar sugestões</button>
-          <button class="btn btn-ghost" id="useContextBtn" title="Usa o diagnóstico do mapa junto do que você escreveu">
-            ➕ Usar diagnóstico do Mapa
-          </button>
-        </div>
+      <div class="askTitle">✍️ Quer mais alguma sugestão?</div>
+      <div class="askHelp">
+        Digite a situação, clima, ambiente e orçamento. Ex.: <i>“Noite, clima quente, evento casual, até R$600; quero algo amadeirado sem doce.”</i>
       </div>
+
+      <textarea id="prompt" placeholder="Quer mais alguma sugestão? Digite a situação, clima, ambiente e orçamento!"></textarea>
+
+      <div class="row">
+        <button class="primary" id="sendBtn">✨ Gerar sugestões</button>
+        <button class="ghost" id="clearBtn">Limpar</button>
+      </div>
+
+      <div class="hint">Dentro do Mapa, o diagnóstico chega automaticamente e gera os 3 cards iniciais.</div>
     </div>
   </div>
 
   <script>
-    // ===== CONFIG =====
     const ENDPOINT_URL = "https://operfumista-api.vercel.app/api/perfumista";
     const MAPA_ALLOWED_ORIGIN = "https://vguerise.github.io";
 
-    // ===== STATE =====
-    let DIAG_CONTEXT = ""; // fica escondido (não aparece na tela)
-    let useContext = true; // botão “Usar diagnóstico do Mapa” liga/desliga
+    let contextoMapa = ""; // invisível (só pra orientar a IA)
 
-    // ===== postMessage helper =====
+    const cardsEl = document.getElementById("cards");
+    const promptEl = document.getElementById("prompt");
+    const sendBtn = document.getElementById("sendBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(t){ statusEl.textContent = t || ""; sendHeightToParent(); }
+    function escapeHtml(s){
+      return String(s||"")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
+
     function notifyParent(type, payload = {}) {
       if (window.parent === window) return;
       try {
-        window.parent.postMessage({ source: "operfumista", type, ...payload }, MAPA_ALLOWED_ORIGIN);
+        window.parent.postMessage({ source:"operfumista", type, ...payload }, MAPA_ALLOWED_ORIGIN);
       } catch (e) {}
     }
 
-    // ===== auto height to parent =====
     let _heightTicking = false;
-    function sendHeightToParent() {
+    function sendHeightToParent(){
       if (_heightTicking) return;
       _heightTicking = true;
       requestAnimationFrame(() => {
         _heightTicking = false;
         const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-        notifyParent("height", { height: h });
+        notifyParent("height", { height:h });
       });
     }
+
     window.addEventListener("load", () => {
       sendHeightToParent();
-      setTimeout(sendHeightToParent, 250);
-      setTimeout(sendHeightToParent, 650);
+      setTimeout(sendHeightToParent, 200);
+      setTimeout(sendHeightToParent, 600);
     });
-    try {
+
+    try{
       const ro = new ResizeObserver(() => sendHeightToParent());
       ro.observe(document.body);
-    } catch (e) {
-      setInterval(sendHeightToParent, 900);
+    }catch(e){
+      setInterval(sendHeightToParent, 800);
     }
 
-    // ===== UI refs =====
-    const statusEl = document.getElementById("status");
-    const promptEl = document.getElementById("prompt");
-    const sendBtn = document.getElementById("sendBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const useContextBtn = document.getElementById("useContextBtn");
-
-    const cardsEl = document.getElementById("cards");
-    const headerEl = document.getElementById("resultHeader");
-    const headerSubEl = document.getElementById("resultSub");
-    const errEl = document.getElementById("err");
-
-    function setStatus(t) { statusEl.textContent = t; sendHeightToParent(); }
-    function showError(msg) { errEl.style.display="block"; errEl.textContent = msg; sendHeightToParent(); }
-    function clearError(){ errEl.style.display="none"; errEl.textContent=""; sendHeightToParent(); }
-
-    clearBtn.addEventListener("click", () => {
-      promptEl.value = "";
-      clearError();
-      sendHeightToParent();
-      promptEl.focus();
-    });
-
-    useContextBtn.addEventListener("click", () => {
-      useContext = !useContext;
-      useContextBtn.textContent = useContext ? "➕ Usar diagnóstico do Mapa" : "⛔ Sem diagnóstico do Mapa";
-      setStatus(useContext ? "Ok — vou usar o diagnóstico do Mapa como contexto." : "Ok — vou ignorar o diagnóstico do Mapa.");
-    });
-
-    // ===== Helpers =====
-    function cleanMarkdown(s){
-      return String(s || "")
-        .replaceAll("**","")
-        .replaceAll("__","")
-        .replaceAll("`","")
-        .trim();
+    function renderBanner(titulo, subtitulo){
+      const div = document.createElement("div");
+      div.className = "banner";
+      div.innerHTML = `
+        <h3>${escapeHtml(titulo || "🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO")}</h3>
+        <p>${escapeHtml(subtitulo || "Baseado no seu contexto e lacunas identificadas.")}</p>
+      `;
+      cardsEl.appendChild(div);
     }
 
-    function pickField(lines, keyRegex){
-      for (const l of lines){
-        const m = l.match(keyRegex);
-        if (m) return cleanMarkdown(m[1] || m[2] || "").trim();
-      }
-      return "";
+    function renderRecCard(rec, idx){
+      const nome   = rec?.nome || "Recomendação";
+      const familia= rec?.familia || "";
+      const faixa  = rec?.faixa_preco || "";
+      const porQue = rec?.por_que || "";
+      const quando = rec?.quando_usar || "";
+
+      const div = document.createElement("div");
+      div.className = "recCard";
+      div.innerHTML = `
+        <div class="badgeNum">${idx+1}</div>
+        <div class="recTitle">${escapeHtml(nome)}</div>
+
+        <div class="metaLine">
+          ${familia ? `<span class="pill">🍋 <b>${escapeHtml(familia)}</b></span>` : ""}
+          ${faixa ? `<span class="pill">💰 <b>${escapeHtml(faixa)}</b></span>` : ""}
+        </div>
+
+        <div class="recBody">
+          ${porQue ? `<div><b>Por que combina:</b> ${escapeHtml(porQue)}</div>` : ""}
+          ${quando ? `<div style="margin-top:8px;"><b>Quando usar:</b> ${escapeHtml(quando)}</div>` : ""}
+        </div>
+      `;
+      cardsEl.appendChild(div);
     }
 
-    function splitRecommendations(raw){
-      // captura blocos começando com "1." ou "1)" no início de linha
-      const text = String(raw || "");
-      const blocks = text.split(/\n\s*(?=\d+\s*[\.\)]\s+)/g).map(s=>s.trim()).filter(Boolean);
-      const items = blocks.filter(b => /^\d+\s*[\.\)]\s+/.test(b)).slice(0,3);
-      return items;
-    }
-
-    function parseBlock(block){
-      // remove "1." do início
-      const firstLineMatch = block.match(/^(\d+)\s*[\.\)]\s*([\s\S]*)$/);
-      const n = firstLineMatch ? Number(firstLineMatch[1]) : 1;
-      const content = firstLineMatch ? firstLineMatch[2].trim() : block.trim();
-
-      const lines = content.split("\n").map(l=>l.trim()).filter(Boolean);
-
-      // Nome costuma estar na primeira linha (às vezes com **)
-      let name = cleanMarkdown(lines[0] || `Recomendação ${n}`);
-
-      // Campos
-      const familia = pickField(lines, /^fam[ií]lia\s*:\s*(.+)$/i);
-      const faixa   = pickField(lines, /^(faixa|pre[çc]o|or[çc]amento)\s*:\s*(.+)$/i) || pickField(lines, /^(?:faixa)\s*:\s*(.+)$/i);
-      const quando  = pickField(lines, /^quando\s+usar\s*:\s*(.+)$/i);
-      const porque  = pickField(lines, /^(por\s+que\s+combina|por\s+quê\s+combina|por\s+que|por\s+quê)\s*:\s*(.+)$/i);
-
-      // fallback: tenta achar “Faixa: …” mesmo se o regex pegou grupo errado
-      const faixa2 = faixa && faixa.startsWith("Faixa") ? faixa.replace(/^Faixa\s*:\s*/i,"") : faixa;
-
-      return { n, name, familia, faixa: faixa2, quando, porque };
-    }
-
-    function parseResponse(raw){
-      const text = String(raw || "").trim();
-      if (!text) return null;
-
-      const blocks = splitRecommendations(text);
-
-      // Se não vier formatado como 1./2./3., cai no modo “1 card”
-      if (!blocks.length){
-        return {
-          title: "3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO",
-          items: [{ n: 1, name: "Sugestões", familia:"", faixa:"", quando:"", porque: cleanMarkdown(text) }]
-        };
-      }
-
-      const items = blocks.map(parseBlock);
-
-      return { title: "3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO", items };
-    }
-
-    function render(parsed){
+    function renderFromJson(data){
       cardsEl.innerHTML = "";
-      headerEl.style.display = "block";
-      headerSubEl.textContent = "Baseado no seu contexto e lacunas identificadas.";
 
-      const frag = document.createDocumentFragment();
+      renderBanner(data?.titulo, data?.subtitulo);
 
-      parsed.items.forEach(it => {
-        const card = document.createElement("div");
-        card.className = "recCard";
-        card.innerHTML = `
-          <div class="recTop">
-            <div class="num">${it.n}</div>
-            <div style="flex:1">
-              <h3 class="recName">${it.name}</h3>
-              <div class="meta">
-                ${it.familia ? `<span class="pill">🌿 <b>Família:</b> ${it.familia}</span>` : `<span class="pill">✅ Recomendação</span>`}
-                ${it.faixa ? `<span class="pill">💰 <b>Faixa:</b> ${it.faixa}</span>` : ``}
-              </div>
-            </div>
-          </div>
-
-          <div class="body">
-            <div class="kv">
-              ${it.quando ? `<p><span class="k">Quando usar:</span> <span class="v">${it.quando}</span></p>` : ``}
-              ${it.porque ? `<p><span class="k">Por que combina:</span> <span class="v">${it.porque}</span></p>` : ``}
-            </div>
-          </div>
+      const recs = Array.isArray(data?.recomendacoes) ? data.recomendacoes : [];
+      if (recs.length){
+        recs.slice(0,3).forEach((r,i) => renderRecCard(r,i));
+      } else {
+        const div = document.createElement("div");
+        div.className = "recCard";
+        div.innerHTML = `
+          <div class="badgeNum">!</div>
+          <div class="recTitle">Resposta do Perfumista</div>
+          <div class="recBody">${escapeHtml(data?.raw || "Não veio conteúdo para renderizar.")}</div>
         `;
-        frag.appendChild(card);
-      });
+        cardsEl.appendChild(div);
+      }
 
-      cardsEl.appendChild(frag);
+      setStatus("Pronto.");
       sendHeightToParent();
     }
 
-    async function callApi(finalPrompt) {
-      clearError();
+    async function callPerfumista(texto){
       setStatus("Consultando o Perfumista…");
-      notifyParent("loading", { value: true });
+      notifyParent("loading", { value:true });
+      sendBtn.disabled = true;
 
-      try {
-        sendBtn.disabled = true;
-
+      try{
         const r = await fetch(ENDPOINT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: finalPrompt })
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ diagnostico: texto })
         });
 
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data?.error ? String(data.error) : ("HTTP " + r.status));
+        if (!r.ok) throw new Error(data?.error ? String(data.error) : ("HTTP "+r.status));
 
-        const text = (data?.text || "").trim();
-        if (!text) throw new Error("Resposta vazia da API.");
-
-        const parsed = parseResponse(text);
-        render(parsed);
-
-        setStatus("Pronto.");
-        notifyParent("done", { value: true });
-
-      } catch (e) {
-        showError("Erro ao consultar o agente: " + String(e?.message || e));
+        renderFromJson(data);
+      }catch(e){
+        cardsEl.innerHTML = "";
+        const div = document.createElement("div");
+        div.className = "recCard";
+        div.innerHTML = `
+          <div class="badgeNum">!</div>
+          <div class="recTitle">Erro</div>
+          <div class="recBody">${escapeHtml(e?.message || String(e))}</div>
+        `;
+        cardsEl.appendChild(div);
         setStatus("Erro.");
-        notifyParent("error", { message: String(e?.message || e) });
-
-      } finally {
+      }finally{
         sendBtn.disabled = false;
-        notifyParent("loading", { value: false });
+        notifyParent("loading", { value:false });
         sendHeightToParent();
       }
     }
 
-    // clique "Gerar sugestões"
+    // Nova pergunta: usa contexto do mapa por trás
     sendBtn.addEventListener("click", async () => {
-      const userText = (promptEl.value || "").trim();
-
-      let finalPrompt = "";
-      if (!userText && DIAG_CONTEXT && useContext) {
-        finalPrompt = DIAG_CONTEXT;
-      } else if (userText && DIAG_CONTEXT && useContext) {
-        finalPrompt =
-          "DIAGNÓSTICO (contexto):\n" + DIAG_CONTEXT +
-          "\n\nPEDIDO (agora):\n" + userText;
-      } else {
-        finalPrompt = userText;
-      }
-
-      if (!finalPrompt.trim()) {
-        setStatus("Digite sua situação ou use um diagnóstico do Mapa.");
-        promptEl.focus();
+      const pergunta = (promptEl.value || "").trim();
+      if (!pergunta){
+        setStatus("Digite sua situação no campo em branco.");
         return;
       }
 
-      await callApi(finalPrompt);
+      const texto = contextoMapa
+        ? (contextoMapa + "\n\nPedido adicional do usuário: " + pergunta)
+        : pergunta;
 
-      // sempre volta em branco (pra incentivar pedir mais)
+      await callPerfumista(texto);
+      promptEl.value = ""; // fica sempre limpo
+    });
+
+    clearBtn.addEventListener("click", () => {
       promptEl.value = "";
+      cardsEl.innerHTML = "";
+      setStatus("Pronto.");
       sendHeightToParent();
     });
 
-    // ===== Receber do Mapa via iframe =====
+    // Recebe diagnóstico do Mapa e roda automaticamente
     window.addEventListener("message", async (event) => {
       if (event.origin !== MAPA_ALLOWED_ORIGIN) return;
 
-      const data = event.data || {};
+      const data = event?.data || {};
       if (data.source !== "mapa" || data.type !== "set_and_run") return;
 
       const texto = (data.text || "").trim();
       if (!texto) return;
 
-      // guarda contexto (invisível) e roda
-      DIAG_CONTEXT = texto;
-      await callApi(texto);
-
-      // textarea sempre em branco
+      contextoMapa = texto;
+      await callPerfumista(contextoMapa);
       promptEl.value = "";
-      sendHeightToParent();
     });
   </script>
 </body>
