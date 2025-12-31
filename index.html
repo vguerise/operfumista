@@ -7,74 +7,183 @@
   <style>
     :root{
       --bg:#121212;
-      --card:#1e1e1e;
-      --card2:#2d2d2d;
+      --panel: rgba(0,0,0,.35);
+      --panel2: rgba(0,0,0,.22);
+      --border: rgba(212,175,55,.25);
       --gold:#d4af37;
-      --muted:#b9b9b9;
+      --gold2:#f4e5b1;
       --text:#f2f2f2;
+      --muted:#b9b9b9;
+      --soft:#2a2a2a;
       --danger:#ff6b6b;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:linear-gradient(135deg,var(--card2) 0%,var(--bg) 100%);
-      color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(1200px 700px at 50% 10%, rgba(212,175,55,.10), transparent 60%),
+                  linear-gradient(135deg, #2b2b2b 0%, #121212 60%);
+      color: var(--text);
     }
     .wrap{
-      max-width: 980px;
+      max-width: 1020px;
       margin: 0 auto;
       padding: 22px 16px 28px;
     }
     .card{
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(212,175,55,.25);
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-radius: 18px;
       padding: 18px;
       box-shadow: 0 18px 50px rgba(0,0,0,.45);
       backdrop-filter: blur(6px);
     }
-    .header{
+
+    .top{
       display:flex;
-      gap:14px;
       align-items:center;
-      margin-bottom:14px;
+      gap:14px;
+      margin-bottom: 12px;
     }
     .badge{
       width:44px;height:44px;border-radius:12px;
       display:flex;align-items:center;justify-content:center;
-      background: linear-gradient(135deg, var(--gold) 0%, #f4e5b1 100%);
-      color:#111;font-weight:800;
-      box-shadow: 0 10px 25px rgba(212,175,55,.25);
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+      color:#111;font-weight:900;
+      box-shadow: 0 12px 30px rgba(212,175,55,.25);
       flex:0 0 auto;
     }
-    .title{
+    h1{
       margin:0;
       font-size: 1.25rem;
       letter-spacing:.2px;
     }
-    .subtitle{
-      margin:2px 0 0;
+    .sub{
+      margin:4px 0 0;
       color: var(--muted);
-      font-size: .92rem;
-      line-height: 1.3;
+      font-size:.92rem;
+      line-height:1.35;
     }
 
-    .row{
+    .status{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+      min-height: 22px;
+    }
+
+    /* ===== Result header ===== */
+    .resultHeader{
+      margin-top: 14px;
+      border: 1px solid rgba(212,175,55,.22);
+      background: rgba(212,175,55,.08);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+    .resultHeader .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color: var(--gold2);
+      margin:0 0 4px;
+    }
+    .resultHeader .desc{
+      margin:0;
+      color: rgba(242,242,242,.75);
+      font-size: .92rem;
+    }
+
+    /* ===== Cards ===== */
+    .cards{
+      margin-top: 14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .recCard{
+      border: 1px solid rgba(212,175,55,.22);
+      background: rgba(0,0,0,.28);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .recTop{
       display:flex;
       gap:12px;
+      align-items:flex-start;
+    }
+    .num{
+      width:38px;height:38px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      background: rgba(212,175,55,.16);
+      border: 1px solid rgba(212,175,55,.35);
+      color: var(--gold2);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .recName{
+      margin:0;
+      font-size: 1.05rem;
+      font-weight:900;
+      color: var(--gold2);
+      line-height: 1.2;
+    }
+    .meta{
+      margin: 6px 0 0;
+      color: rgba(155,196,255,.95);
+      font-size: .95rem;
+      display:flex;
       flex-wrap:wrap;
-      margin: 12px 0 10px;
+      gap:10px;
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(242,242,242,.90);
+      font-size: .92rem;
+    }
+    .body{
+      margin-top: 10px;
+      color: rgba(242,242,242,.92);
+      line-height:1.45;
+      white-space: pre-wrap;
+    }
+    .foot{
+      margin-top: 10px;
+      color: rgba(242,242,242,.55);
+      font-size: .88rem;
+      font-style: italic;
+    }
+
+    /* ===== Ask area ===== */
+    .ask{
+      margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      padding-top: 14px;
+    }
+    label{
+      display:block;
+      margin: 0 0 8px;
+      color: rgba(242,242,242,.86);
+      font-weight:800;
+      letter-spacing:.2px;
     }
     textarea{
       width:100%;
-      min-height: 120px;
+      min-height: 110px;
       resize: vertical;
       background: rgba(0,0,0,.35);
       color: var(--text);
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 14px;
-      padding: 14px 14px;
+      padding: 14px;
       font-size: 1rem;
       outline: none;
     }
@@ -82,14 +191,20 @@
       border-color: rgba(212,175,55,.55);
       box-shadow: 0 0 0 3px rgba(212,175,55,.12);
     }
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
     .btn{
       appearance:none;
       border:0;
       border-radius: 12px;
       padding: 12px 16px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
-      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+      transition: transform .15s ease, opacity .15s ease;
       display:inline-flex;
       align-items:center;
       gap:10px;
@@ -98,7 +213,7 @@
     }
     .btn:active{ transform: translateY(1px); }
     .btn-primary{
-      background: linear-gradient(135deg, var(--gold) 0%, #f4e5b1 100%);
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
       color:#111;
       box-shadow: 0 12px 30px rgba(212,175,55,.25);
     }
@@ -109,41 +224,11 @@
     }
     .btn[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
 
-    .status{
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: .9rem;
-      min-height: 22px;
-    }
-
-    /* Chat area: sem scroll interno (pra não ter scroll duplo no mapa) */
-    #chat{
-      margin-top: 14px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .msg{
-      padding: 12px 14px;
-      border-radius: 14px;
-      line-height: 1.45;
-      white-space: pre-wrap;
-      word-break: break-word;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.28);
-    }
-    .msg.user{
-      border-color: rgba(212,175,55,.28);
-      background: rgba(212,175,55,.08);
-    }
-    .msg.bot{
-      border-color: rgba(155,196,255,.20);
-      background: rgba(155,196,255,.06);
-    }
-    .hint{
+    .err{
       margin-top: 10px;
-      color:#8f8f8f;
-      font-size: .85rem;
+      color: var(--danger);
+      font-weight:800;
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -151,106 +236,202 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="header">
+      <div class="top">
         <div class="badge">🤖</div>
         <div>
-          <h1 class="title">O Perfumista</h1>
-          <p class="subtitle">Cole seu diagnóstico, clique em enviar e receba 3 sugestões objetivas.</p>
+          <h1>O Perfumista</h1>
+          <p class="sub">Respostas em cards (sem scroll interno). Digite nova pergunta no final.</p>
         </div>
       </div>
 
-      <textarea id="prompt" placeholder="Cole aqui o diagnóstico do Mapa…"></textarea>
+      <div id="status" class="status">Pronto.</div>
 
-      <div class="row">
-        <button class="btn btn-primary" id="sendBtn">
-          ✨ Enviar para o Perfumista
-        </button>
-        <button class="btn btn-ghost" id="clearBtn">
-          🧽 Limpar
-        </button>
+      <!-- RESULTADOS -->
+      <div id="resultHeader" class="resultHeader" style="display:none;">
+        <div class="title">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
+        <p class="desc" id="resultSub">Baseado no seu diagnóstico e lacunas identificadas.</p>
       </div>
 
-      <div class="status" id="status">Pronto.</div>
+      <div id="cards" class="cards"></div>
 
-      <div id="chat"></div>
-      <div class="hint">Dica: se estiver dentro do Mapa (iframe), o resultado aparece aqui e o Mapa ajusta a altura automaticamente.</div>
+      <div id="err" class="err" style="display:none;"></div>
+
+      <!-- PERGUNTA SEMPRE ABERTA -->
+      <div class="ask">
+        <label for="prompt">Cole o diagnóstico (ou digite uma nova pergunta):</label>
+        <textarea id="prompt" placeholder="Ex: Tenho 7 perfumes, clima quente, trabalho fechado, faltam floral e frutado..."></textarea>
+
+        <div class="row">
+          <button class="btn btn-primary" id="sendBtn">✨ Gerar sugestões</button>
+          <button class="btn btn-ghost" id="clearBtn">🧽 Limpar</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // ======== CONFIG ========
+    // ===== CONFIG =====
     const ENDPOINT_URL = "https://operfumista-api.vercel.app/api/perfumista";
     const MAPA_ALLOWED_ORIGIN = "https://vguerise.github.io";
 
-    // ======== postMessage helper (fala com o Mapa) ========
+    // ===== postMessage helper (fala com o Mapa) =====
     function notifyParent(type, payload = {}) {
       if (window.parent === window) return;
       try {
-        window.parent.postMessage(
-          { source: "operfumista", type, ...payload },
-          MAPA_ALLOWED_ORIGIN
-        );
+        window.parent.postMessage({ source: "operfumista", type, ...payload }, MAPA_ALLOWED_ORIGIN);
       } catch (e) {}
     }
 
-    // ======== auto height to parent (evita scroll duplo no iframe) ========
+    // ===== auto height to parent (evita scroll duplo no iframe) =====
     let _heightTicking = false;
     function sendHeightToParent() {
       if (_heightTicking) return;
       _heightTicking = true;
-
       requestAnimationFrame(() => {
         _heightTicking = false;
-        const h = Math.max(
-          document.body.scrollHeight,
-          document.documentElement.scrollHeight
-        );
+        const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
         notifyParent("height", { height: h });
       });
     }
-
     window.addEventListener("load", () => {
       sendHeightToParent();
-      setTimeout(sendHeightToParent, 200);
-      setTimeout(sendHeightToParent, 600);
+      setTimeout(sendHeightToParent, 250);
+      setTimeout(sendHeightToParent, 650);
     });
-
     try {
       const ro = new ResizeObserver(() => sendHeightToParent());
       ro.observe(document.body);
     } catch (e) {
-      setInterval(sendHeightToParent, 800);
+      setInterval(sendHeightToParent, 900);
     }
 
-    // ======== UI ========
-    const chat = document.getElementById("chat");
+    // ===== UI refs =====
+    const statusEl = document.getElementById("status");
     const promptEl = document.getElementById("prompt");
     const sendBtn = document.getElementById("sendBtn");
     const clearBtn = document.getElementById("clearBtn");
-    const statusEl = document.getElementById("status");
-
-    function addMsg(text, who) {
-      const div = document.createElement("div");
-      div.className = "msg " + who;
-      div.textContent = text;
-      chat.appendChild(div);
-      sendHeightToParent();
-    }
+    const cardsEl = document.getElementById("cards");
+    const headerEl = document.getElementById("resultHeader");
+    const headerSubEl = document.getElementById("resultSub");
+    const errEl = document.getElementById("err");
 
     function setStatus(t) {
       statusEl.textContent = t;
       sendHeightToParent();
     }
+    function showError(msg) {
+      errEl.style.display = "block";
+      errEl.textContent = msg;
+      sendHeightToParent();
+    }
+    function clearError() {
+      errEl.style.display = "none";
+      errEl.textContent = "";
+      sendHeightToParent();
+    }
+    function clearCards() {
+      cardsEl.innerHTML = "";
+      headerEl.style.display = "none";
+      sendHeightToParent();
+    }
 
     clearBtn.addEventListener("click", () => {
       promptEl.value = "";
-      chat.innerHTML = "";
+      clearError();
+      clearCards();
       setStatus("Pronto.");
       sendHeightToParent();
     });
 
-    async function runPerfumista(prompt) {
-      addMsg(prompt, "user");
+    // ===== Parser: tenta transformar texto em 3 blocos =====
+    function parseToCards(text) {
+      const raw = (text || "").trim();
+      if (!raw) return null;
+
+      // Pega título (primeira linha antes do "1)")
+      let title = "";
+      const idx = raw.search(/\n\s*1\)/);
+      if (idx > 0) title = raw.slice(0, idx).trim();
+      if (!title) title = "3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO";
+
+      // Divide em itens 1) 2) 3)
+      const parts = raw.split(/\n\s*(?=\d\)\s+)/).map(s => s.trim()).filter(Boolean);
+      const items = parts.filter(p => /^\d\)\s+/.test(p)).slice(0, 3);
+
+      if (items.length === 0) return { title, items: [{ n: 1, name: "Resposta", meta: "", body: raw }] };
+
+      const cards = items.map((block) => {
+        const m = block.match(/^(\d+)\)\s*([\s\S]*)$/);
+        const n = m ? Number(m[1]) : 1;
+        const content = (m ? m[2] : block).trim();
+
+        // Primeira linha = nome (até quebra de linha)
+        const lines = content.split("\n").map(l => l.trim()).filter(Boolean);
+        const first = lines[0] || `Recomendação ${n}`;
+
+        // Tenta achar uma linha meta (com "•" ou " - " ou "R$")
+        let meta = "";
+        for (const l of lines.slice(1, 5)) {
+          if (/[•\-]/.test(l) && /R\$|€|\$|c[ií]trico|amadeir|gourmand|aqu[aá]tico|floral|foug[eê]re|oriental|arom[aá]tico|frut/i.test(l)) {
+            meta = l.replace(/^[-•]\s*/, "");
+            break;
+          }
+        }
+
+        // Corpo = tudo menos a primeira linha e a meta, se existir
+        let bodyLines = lines.slice(1);
+        if (meta) bodyLines = bodyLines.filter(l => l.replace(/^[-•]\s*/, "") !== meta);
+        const body = bodyLines.join("\n").trim();
+
+        return { n, name: first, meta, body };
+      });
+
+      return { title, items: cards };
+    }
+
+    function renderCards(parsed) {
+      clearCards();
+      clearError();
+
+      headerEl.style.display = "block";
+      headerSubEl.textContent = "Baseado no seu diagnóstico e lacunas identificadas.";
+
+      const frag = document.createDocumentFragment();
+
+      parsed.items.forEach((it) => {
+        const card = document.createElement("div");
+        card.className = "recCard";
+
+        card.innerHTML = `
+          <div class="recTop">
+            <div class="num">${it.n}</div>
+            <div style="flex:1">
+              <h3 class="recName">${escapeHtml(it.name)}</h3>
+              <div class="meta">
+                ${it.meta ? `<span class="pill">💠 ${escapeHtml(it.meta)}</span>` : `<span class="pill">✅ Recomendação</span>`}
+              </div>
+            </div>
+          </div>
+          ${it.body ? `<div class="body">${escapeHtml(it.body)}</div>` : ""}
+        `;
+        frag.appendChild(card);
+      });
+
+      cardsEl.appendChild(frag);
+      sendHeightToParent();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function run(prompt) {
+      clearError();
       setStatus("Consultando o Perfumista…");
       notifyParent("loading", { value: true });
 
@@ -264,7 +445,6 @@
         });
 
         const data = await r.json().catch(() => ({}));
-
         if (!r.ok) {
           const msg = data?.error ? String(data.error) : ("HTTP " + r.status);
           throw new Error(msg);
@@ -273,12 +453,14 @@
         const text = (data?.text || "").trim();
         if (!text) throw new Error("Resposta vazia da API.");
 
-        addMsg(text, "bot");
+        const parsed = parseToCards(text);
+        renderCards(parsed);
+
         setStatus("Pronto.");
         notifyParent("done", { value: true });
 
       } catch (e) {
-        addMsg("Erro ao consultar o agente: " + String(e?.message || e), "bot");
+        showError("Erro ao consultar o agente: " + String(e?.message || e));
         setStatus("Erro.");
         notifyParent("error", { message: String(e?.message || e) });
 
@@ -295,10 +477,10 @@
         setStatus("Escreva ou cole algo no campo acima.");
         return;
       }
-      await runPerfumista(prompt);
+      await run(prompt);
     });
 
-    // ======== Receber comando do Mapa via iframe ========
+    // ===== Receber comando do Mapa via iframe =====
     window.addEventListener("message", async (event) => {
       if (event.origin !== MAPA_ALLOWED_ORIGIN) return;
 
@@ -308,11 +490,9 @@
       const texto = (data.text || "").trim();
       if (!texto) return;
 
+      // Preenche e executa automaticamente
       promptEl.value = texto;
-      chat.innerHTML = "";
-      sendHeightToParent();
-
-      await runPerfumista(texto);
+      await run(texto);
     });
   </script>
 </body>
