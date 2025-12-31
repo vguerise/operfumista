@@ -54,7 +54,8 @@ h1{
 }
 .rec b{color:var(--gold)}
 .rec ul{margin:8px 0 0 18px;color:var(--muted)}
-textarea{
+textarea{font-size:16px;
+
   width:100%;
   min-height:110px;
   margin-top:12px;
@@ -86,7 +87,7 @@ button{
     <div id="status">Pronto.</div>
     <div id="cards"></div>
 
-    <textarea id="prompt" placeholder="Quer mais alguma recomendação?"></textarea>
+    <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa! Quer mais alguma recomendação?"></textarea>
     <button id="sendBtn">Gerar</button>
   </div>
 </div>
@@ -110,7 +111,14 @@ function setStatus(t){
 function resize(){
   if(window.parent!==window){
     window.parent.postMessage(
-      {source:"operfumista",type:"height",height:document.body.scrollHeight},
+      {source:"operfumista",type:"height",height:document.body.scrollHeight}
+
+function notifyParent(type, extra = {}){
+  if(window.parent!==window){
+    window.parent.postMessage(Object.assign({ source:"operfumista", type }, extra), MAPA_ORIGIN);
+  }
+}
+,
       MAPA_ORIGIN
     );
   }
@@ -125,6 +133,7 @@ function warmupPerfumista(){
 
 async function chamarIA(text){
   if(!text.trim()) return;
+  notifyParent("loading");
   setStatus("Consultando o Perfumista…");
   try{
     const r = await fetch(API,{
@@ -137,9 +146,11 @@ async function chamarIA(text){
 
     render(data);
     setStatus("Pronto.");
+    notifyParent("done");
   }catch(e){
     cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
     setStatus("Erro.");
+    notifyParent("error", { message: e.message });
   }
   resize();
 }
