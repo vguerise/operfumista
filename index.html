@@ -93,6 +93,7 @@ button{
 
 <script>
 const API = "https://operfumista-api.vercel.app/api/perfumista";
+const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup"; // ✅ NOVO
 const MAPA_ORIGIN = "https://vguerise.github.io";
 
 let contextoMapa="";
@@ -115,14 +116,10 @@ function resize(){
   }
 }
 
-/* 🟡 WARM-UP (NOVA FUNÇÃO) */
+/* 🟡 WARM-UP (corrigido: não chama OpenAI) */
 function warmupPerfumista(){
   try{
-    fetch(API,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ diagnostico:"warmup", warmup:true })
-    }).catch(()=>{});
+    fetch(WARMUP_URL, { method:"GET" }).catch(()=>{});
   }catch(e){}
 }
 
@@ -178,7 +175,7 @@ window.addEventListener("message",e=>{
   }
 });
 
-/* 🟡 AQUI chamamos o warm-up (NOVA LINHA) */
+/* 🟡 AQUI chamamos o warm-up */
 window.addEventListener("load", ()=>{
   warmupPerfumista();
   resize();
