@@ -93,7 +93,7 @@ button{
 
 <script>
 const API = "https://operfumista-api.vercel.app/api/perfumista";
-const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup";
+const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup"; // ✅ NOVO
 const MAPA_ORIGIN = "https://vguerise.github.io";
 
 let contextoMapa="";
@@ -116,29 +116,16 @@ function resize(){
   }
 }
 
-/* 🟡 WARM-UP (não chama OpenAI) */
+/* 🟡 WARM-UP (corrigido: não chama OpenAI) */
 function warmupPerfumista(){
   try{
     fetch(WARMUP_URL, { method:"GET" }).catch(()=>{});
   }catch(e){}
 }
 
-/* 🔥 NOVO: comunica estado ao Mapa (popup) */
-function notifyParent(type, extra = {}){
-  if(window.parent!==window){
-    window.parent.postMessage(
-      Object.assign({ source:"operfumista", type }, extra),
-      MAPA_ORIGIN
-    );
-  }
-}
-
 async function chamarIA(text){
   if(!text.trim()) return;
-
-  notifyParent("loading");                 // 🔥 abre/segura popup
   setStatus("Consultando o Perfumista…");
-
   try{
     const r = await fetch(API,{
       method:"POST",
@@ -150,11 +137,9 @@ async function chamarIA(text){
 
     render(data);
     setStatus("Pronto.");
-    notifyParent("done");                  // 🔥 fecha popup ao renderizar
   }catch(e){
     cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
     setStatus("Erro.");
-    notifyParent("error", { message: e.message });  // 🔥 garante fechamento
   }
   resize();
 }
@@ -190,7 +175,7 @@ window.addEventListener("message",e=>{
   }
 });
 
-/* 🟡 Warm-up no load */
+/* 🟡 AQUI chamamos o warm-up */
 window.addEventListener("load", ()=>{
   warmupPerfumista();
   resize();
