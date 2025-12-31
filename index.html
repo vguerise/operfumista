@@ -6,59 +6,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+:root{
+  --gold:#d4af37;
+  --bg:#0b0b0c;
+  --card:#111;
+  --text:#fff;
+  --muted:#aaa;
+  --radius:16px;
+}
 body{
   margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background:#0b0b0c;
-  color:white;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
 }
 .container{
   max-width:900px;
   margin:auto;
-  padding:24px;
+  padding:28px 18px;
 }
 h1{
-  color:#d4af37;
-  letter-spacing:3px;
   text-align:center;
+  color:var(--gold);
+  letter-spacing:3px;
 }
 .card{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(212,175,55,.3);
-  border-radius:16px;
+  background:#111;
+  border:1px solid rgba(212,175,55,.35);
+  border-radius:18px;
   padding:20px;
-  margin-top:20px;
+}
+#status{
+  color:var(--muted);
+  margin-bottom:10px;
+}
+.rec{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+.rec b{
+  color:var(--gold);
 }
 textarea{
   width:100%;
   min-height:120px;
   background:#000;
   border:1px solid rgba(255,255,255,.2);
+  border-radius:12px;
   color:white;
   padding:12px;
-  border-radius:12px;
+  margin-top:10px;
 }
 button{
   margin-top:10px;
   padding:12px 16px;
-  font-weight:700;
   border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-.primary{
-  background:#d4af37;
-  color:black;
-}
-#status{
-  margin-bottom:10px;
-  opacity:.7;
-}
-.rec{
-  border:1px solid rgba(255,255,255,.15);
-  padding:12px;
   border-radius:12px;
-  margin-top:10px;
+  background:var(--gold);
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -71,8 +80,8 @@ button{
     <div id="status">Pronto.</div>
     <div id="respostas"></div>
 
-    <textarea id="prompt" placeholder="Quer mais alguma recomendação?"></textarea>
-    <button class="primary" id="sendBtn">Gerar</button>
+    <textarea id="prompt" placeholder="Quer pedir outra recomendação?"></textarea>
+    <button id="sendBtn">Gerar sugestões</button>
   </div>
 </div>
 
@@ -87,27 +96,31 @@ const respostasEl = document.getElementById("respostas");
 const promptEl = document.getElementById("prompt");
 const sendBtn = document.getElementById("sendBtn");
 
-function setStatus(t){
-  statusEl.textContent = t;
+function setStatus(txt){
+  statusEl.textContent = txt;
   enviarAltura();
 }
 
 function enviarAltura(){
   if(window.parent !== window){
     const h = document.body.scrollHeight;
-    window.parent.postMessage({ source:"operfumista", type:"height", height:h }, MAPA_ORIGIN);
+    window.parent.postMessage(
+      { source:"operfumista", type:"height", height:h },
+      MAPA_ORIGIN
+    );
   }
 }
 
 async function chamarAPI(texto){
-  setStatus("Consultando o Perfumista...");
+  setStatus("Consultando o Perfumista…");
   sendBtn.disabled = true;
 
   try{
     const resp = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({
+        diagnostico: texto,
         prompt: texto
       })
     });
@@ -115,7 +128,7 @@ async function chamarAPI(texto){
     const data = await resp.json();
 
     if(!resp.ok){
-      throw new Error(data.error || "Erro HTTP " + resp.status);
+      throw new Error(data?.error || "HTTP " + resp.status);
     }
 
     renderizar(data);
@@ -137,7 +150,10 @@ function renderizar(data){
     data.recomendacoes.forEach(r=>{
       const div = document.createElement("div");
       div.className="rec";
-      div.innerHTML = `<b>${r.nome}</b><br>${r.por_que || ""}`;
+      div.innerHTML = `
+        <b>${r.nome || "Perfume"}</b><br>
+        ${r.por_que || ""}
+      `;
       respostasEl.appendChild(div);
     });
   }else{
@@ -146,9 +162,9 @@ function renderizar(data){
 }
 
 sendBtn.onclick = ()=>{
-  const texto = promptEl.value.trim();
-  if(!texto) return;
-  const final = contextoMapa ? contextoMapa + "\n\n" + texto : texto;
+  const t = promptEl.value.trim();
+  if(!t) return;
+  const final = contextoMapa ? contextoMapa + "\n\n" + t : t;
   chamarAPI(final);
   promptEl.value="";
 };
