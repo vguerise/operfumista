@@ -54,8 +54,7 @@ h1{
 }
 .rec b{color:var(--gold)}
 .rec ul{margin:8px 0 0 18px;color:var(--muted)}
-textarea{font-size:16px;
-
+textarea{
   width:100%;
   min-height:110px;
   margin-top:12px;
@@ -64,7 +63,11 @@ textarea{font-size:16px;
   border:1px solid rgba(255,255,255,.15);
   border-radius:12px;
   padding:12px;
+  font-size:16px;
 }
+
+textarea::placeholder{color:#fff;opacity:0.85;}
+
 button{
   margin-top:10px;
   padding:12px 18px;
@@ -87,7 +90,7 @@ button{
     <div id="status">Pronto.</div>
     <div id="cards"></div>
 
-    <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa! Quer mais alguma recomendação?"></textarea>
+    <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa!"></textarea>
     <button id="sendBtn">Gerar</button>
   </div>
 </div>
@@ -111,20 +114,23 @@ function setStatus(t){
 function resize(){
   if(window.parent!==window){
     window.parent.postMessage(
-      {source:"operfumista",type:"height",height:document.body.scrollHeight}
-
-function notifyParent(type, extra = {}){
-  if(window.parent!==window){
-    window.parent.postMessage(Object.assign({ source:"operfumista", type }, extra), MAPA_ORIGIN);
-  }
-}
-,
+      {source:"operfumista",type:"height",height:document.body.scrollHeight},
       MAPA_ORIGIN
     );
   }
 }
 
 /* 🟡 WARM-UP (corrigido: não chama OpenAI) */
+
+function notifyParent(type, extra = {}){
+  if(window.parent!==window){
+    window.parent.postMessage(
+      Object.assign({ source:"operfumista", type }, extra),
+      MAPA_ORIGIN
+    );
+  }
+}
+
 function warmupPerfumista(){
   try{
     fetch(WARMUP_URL, { method:"GET" }).catch(()=>{});
@@ -133,8 +139,9 @@ function warmupPerfumista(){
 
 async function chamarIA(text){
   if(!text.trim()) return;
+  
   notifyParent("loading");
-  setStatus("Consultando o Perfumista…");
+setStatus("Consultando o Perfumista…");
   try{
     const r = await fetch(API,{
       method:"POST",
@@ -146,12 +153,14 @@ async function chamarIA(text){
 
     render(data);
     setStatus("Pronto.");
+  
     notifyParent("done");
-  }catch(e){
+}catch(e){
     cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
     setStatus("Erro.");
+  
     notifyParent("error", { message: e.message });
-  }
+}
   resize();
 }
 
