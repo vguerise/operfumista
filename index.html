@@ -14,8 +14,8 @@
       --gold2:#f4e5b1;
       --text:#f2f2f2;
       --muted:#b9b9b9;
-      --soft:#2a2a2a;
       --danger:#ff6b6b;
+      --blue: rgba(155,196,255,.95);
     }
     *{box-sizing:border-box}
     body{
@@ -38,13 +38,7 @@
       box-shadow: 0 18px 50px rgba(0,0,0,.45);
       backdrop-filter: blur(6px);
     }
-
-    .top{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom: 12px;
-    }
+    .top{ display:flex; align-items:center; gap:14px; margin-bottom: 12px; }
     .badge{
       width:44px;height:44px;border-radius:12px;
       display:flex;align-items:center;justify-content:center;
@@ -53,39 +47,70 @@
       box-shadow: 0 12px 30px rgba(212,175,55,.25);
       flex:0 0 auto;
     }
-    h1{
+    h1{ margin:0; font-size: 1.25rem; letter-spacing:.2px; }
+    .sub{ margin:4px 0 0; color: var(--muted); font-size:.92rem; line-height:1.35; }
+    .status{ margin: 10px 0 0; color: var(--muted); font-size: .92rem; min-height: 22px; }
+
+    /* diagnóstico recebido do mapa (opcional, mas ajuda contexto sem “sujar” a caixa de digitação) */
+    .contextBox{
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display:none;
+    }
+    .contextTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 8px;
+    }
+    .contextTitle{
       margin:0;
-      font-size: 1.25rem;
+      font-weight:900;
+      color: rgba(242,242,242,.90);
       letter-spacing:.2px;
+      font-size:.95rem;
     }
-    .sub{
-      margin:4px 0 0;
-      color: var(--muted);
-      font-size:.92rem;
-      line-height:1.35;
+    .miniBtn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-weight:800;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .contextText{
+      margin:0;
+      color: rgba(242,242,242,.78);
+      line-height: 1.35;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow:auto;
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
     }
 
-    .status{
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: .92rem;
-      min-height: 22px;
-    }
-
-    /* ===== Result header ===== */
+    /* ===== RESULT HEADER ===== */
     .resultHeader{
       margin-top: 14px;
       border: 1px solid rgba(212,175,55,.22);
       background: rgba(212,175,55,.08);
       border-radius: 16px;
       padding: 12px 14px;
+      display:none;
     }
     .resultHeader .title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:900;
-      letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+      font-weight:900; letter-spacing:.2px;
       color: var(--gold2);
       margin:0 0 4px;
     }
@@ -95,24 +120,15 @@
       font-size: .92rem;
     }
 
-    /* ===== Cards ===== */
-    .cards{
-      margin-top: 14px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+    /* ===== CARDS ===== */
+    .cards{ margin-top: 14px; display:flex; flex-direction:column; gap:12px; }
     .recCard{
       border: 1px solid rgba(212,175,55,.22);
       background: rgba(0,0,0,.28);
       border-radius: 16px;
       padding: 14px;
     }
-    .recTop{
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-    }
+    .recTop{ display:flex; gap:12px; align-items:flex-start; }
     .num{
       width:38px;height:38px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
@@ -122,59 +138,68 @@
       font-weight:900;
       flex:0 0 auto;
     }
-    .recName{
-      margin:0;
-      font-size: 1.05rem;
-      font-weight:900;
-      color: var(--gold2);
-      line-height: 1.2;
-    }
-    .meta{
-      margin: 6px 0 0;
-      color: rgba(155,196,255,.95);
-      font-size: .95rem;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
+    .recName{ margin:0; font-size: 1.05rem; font-weight:900; color: var(--gold2); line-height: 1.2; }
+    .meta{ margin: 6px 0 0; color: var(--blue); font-size: .95rem; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
     .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 7px 10px;
-      border-radius: 999px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px; border-radius: 999px;
       background: rgba(0,0,0,.25);
       border: 1px solid rgba(255,255,255,.10);
       color: rgba(242,242,242,.90);
       font-size: .92rem;
     }
+
+    /* corpo com formatação melhor */
     .body{
       margin-top: 10px;
       color: rgba(242,242,242,.92);
-      line-height:1.45;
-      white-space: pre-wrap;
+      line-height:1.5;
+      white-space: normal;
     }
-    .foot{
+    .body p{ margin: 0 0 10px; }
+    .body ul{ margin: 6px 0 10px 18px; padding:0; }
+    .body li{ margin: 4px 0; }
+    .body b, .body strong{ color: rgba(242,242,242,.98); }
+    .body .k{ color: rgba(242,242,242,.70); font-weight:800; }
+
+    .err{
       margin-top: 10px;
-      color: rgba(242,242,242,.55);
-      font-size: .88rem;
-      font-style: italic;
+      color: var(--danger);
+      font-weight:800;
+      white-space: pre-wrap;
+      display:none;
     }
 
-    /* ===== Ask area ===== */
+    /* ===== ASK AREA ===== */
     .ask{
-      margin-top: 16px;
+      margin-top: 18px;
       border-top: 1px solid rgba(255,255,255,.10);
       padding-top: 14px;
     }
-    label{
-      display:block;
-      margin: 0 0 8px;
-      color: rgba(242,242,242,.86);
-      font-weight:800;
-      letter-spacing:.2px;
+    .askHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
     }
+    .askTitle{
+      margin:0;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size: 1rem;
+      color: var(--gold2);
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .askHint{
+      margin:0;
+      color: rgba(242,242,242,.72);
+      font-size: .92rem;
+      line-height: 1.35;
+    }
+
     textarea{
       width:100%;
       min-height: 110px;
@@ -191,25 +216,14 @@
       border-color: rgba(212,175,55,.55);
       box-shadow: 0 0 0 3px rgba(212,175,55,.12);
     }
-    .row{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top: 10px;
-    }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; margin-top: 10px; }
     .btn{
-      appearance:none;
-      border:0;
-      border-radius: 12px;
+      appearance:none; border:0; border-radius: 12px;
       padding: 12px 16px;
-      font-weight:900;
-      cursor:pointer;
+      font-weight:900; cursor:pointer;
       transition: transform .15s ease, opacity .15s ease;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      user-select:none;
-      white-space:nowrap;
+      display:inline-flex; align-items:center; gap:10px;
+      user-select:none; white-space:nowrap;
     }
     .btn:active{ transform: translateY(1px); }
     .btn-primary{
@@ -223,13 +237,6 @@
       border: 1px solid rgba(255,255,255,.14);
     }
     .btn[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
-
-    .err{
-      margin-top: 10px;
-      color: var(--danger);
-      font-weight:800;
-      white-space: pre-wrap;
-    }
   </style>
 </head>
 
@@ -240,30 +247,49 @@
         <div class="badge">🤖</div>
         <div>
           <h1>O Perfumista</h1>
-          <p class="sub">Respostas em cards (sem scroll interno). Digite nova pergunta no final.</p>
+          <p class="sub">Sugestões em cards, sem “texto cru”. Você pode pedir mais sugestões no final.</p>
         </div>
       </div>
 
       <div id="status" class="status">Pronto.</div>
 
+      <!-- CONTEXTO RECEBIDO DO MAPA (NÃO VAI PARA A CAIXA DE DIGITAÇÃO) -->
+      <div id="contextBox" class="contextBox">
+        <div class="contextTop">
+          <p class="contextTitle">📌 Diagnóstico recebido do Mapa (usado como contexto)</p>
+          <button class="miniBtn" id="toggleContextBtn">Ocultar</button>
+        </div>
+        <pre id="contextText" class="contextText"></pre>
+      </div>
+
       <!-- RESULTADOS -->
-      <div id="resultHeader" class="resultHeader" style="display:none;">
+      <div id="resultHeader" class="resultHeader">
         <div class="title">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
         <p class="desc" id="resultSub">Baseado no seu diagnóstico e lacunas identificadas.</p>
       </div>
 
       <div id="cards" class="cards"></div>
 
-      <div id="err" class="err" style="display:none;"></div>
+      <div id="err" class="err"></div>
 
-      <!-- PERGUNTA SEMPRE ABERTA -->
+      <!-- PERGUNTA SEMPRE EM BRANCO -->
       <div class="ask">
-        <label for="prompt">Cole o diagnóstico (ou digite uma nova pergunta):</label>
-        <textarea id="prompt" placeholder="Ex: Tenho 7 perfumes, clima quente, trabalho fechado, faltam floral e frutado..."></textarea>
+        <div class="askHeader">
+          <p class="askTitle">✍️ Quer mais alguma sugestão?</p>
+          <button class="miniBtn" id="clearBtn">Limpar</button>
+        </div>
+        <p class="askHint">Digite a situação, clima, ambiente e orçamento. Ex.: “Noite, clima quente, evento casual, até R$600; quero algo amadeirado sem doce”.</p>
+
+        <textarea
+          id="prompt"
+          placeholder="Quer mais alguma sugestão? Digite a situação, clima, ambiente e orçamento!"
+        ></textarea>
 
         <div class="row">
           <button class="btn btn-primary" id="sendBtn">✨ Gerar sugestões</button>
-          <button class="btn btn-ghost" id="clearBtn">🧽 Limpar</button>
+          <button class="btn btn-ghost" id="useContextBtn" title="Usa o diagnóstico do mapa junto do que você escreveu">
+            ➕ Usar diagnóstico do Mapa
+          </button>
         </div>
       </div>
     </div>
@@ -274,7 +300,7 @@
     const ENDPOINT_URL = "https://operfumista-api.vercel.app/api/perfumista";
     const MAPA_ALLOWED_ORIGIN = "https://vguerise.github.io";
 
-    // ===== postMessage helper (fala com o Mapa) =====
+    // ===== postMessage helper =====
     function notifyParent(type, payload = {}) {
       if (window.parent === window) return;
       try {
@@ -282,7 +308,7 @@
       } catch (e) {}
     }
 
-    // ===== auto height to parent (evita scroll duplo no iframe) =====
+    // ===== auto height to parent =====
     let _heightTicking = false;
     function sendHeightToParent() {
       if (_heightTicking) return;
@@ -310,89 +336,147 @@
     const promptEl = document.getElementById("prompt");
     const sendBtn = document.getElementById("sendBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const useContextBtn = document.getElementById("useContextBtn");
+
     const cardsEl = document.getElementById("cards");
     const headerEl = document.getElementById("resultHeader");
     const headerSubEl = document.getElementById("resultSub");
     const errEl = document.getElementById("err");
 
-    function setStatus(t) {
-      statusEl.textContent = t;
+    const contextBox = document.getElementById("contextBox");
+    const contextText = document.getElementById("contextText");
+    const toggleContextBtn = document.getElementById("toggleContextBtn");
+
+    // ===== State =====
+    let DIAG_CONTEXT = ""; // diagnóstico vindo do mapa
+    let contextVisible = true;
+
+    function setStatus(t) { statusEl.textContent = t; sendHeightToParent(); }
+    function showError(msg) { errEl.style.display="block"; errEl.textContent = msg; sendHeightToParent(); }
+    function clearError(){ errEl.style.display="none"; errEl.textContent=""; sendHeightToParent(); }
+
+    function showContextBox(text){
+      DIAG_CONTEXT = text || "";
+      if (!DIAG_CONTEXT) { contextBox.style.display = "none"; return; }
+      contextBox.style.display = "block";
+      contextText.textContent = DIAG_CONTEXT;
+      toggleContextBtn.textContent = contextVisible ? "Ocultar" : "Mostrar";
+      contextText.style.display = contextVisible ? "block" : "none";
       sendHeightToParent();
     }
-    function showError(msg) {
-      errEl.style.display = "block";
-      errEl.textContent = msg;
+
+    toggleContextBtn.addEventListener("click", () => {
+      contextVisible = !contextVisible;
+      contextText.style.display = contextVisible ? "block" : "none";
+      toggleContextBtn.textContent = contextVisible ? "Ocultar" : "Mostrar";
       sendHeightToParent();
-    }
-    function clearError() {
-      errEl.style.display = "none";
-      errEl.textContent = "";
-      sendHeightToParent();
-    }
-    function clearCards() {
-      cardsEl.innerHTML = "";
-      headerEl.style.display = "none";
-      sendHeightToParent();
-    }
+    });
 
     clearBtn.addEventListener("click", () => {
       promptEl.value = "";
       clearError();
-      clearCards();
-      setStatus("Pronto.");
       sendHeightToParent();
+      promptEl.focus();
     });
 
-    // ===== Parser: tenta transformar texto em 3 blocos =====
+    useContextBtn.addEventListener("click", () => {
+      if (!DIAG_CONTEXT) {
+        setStatus("Ainda não recebi um diagnóstico do Mapa.");
+        return;
+      }
+      setStatus("Ok — vou usar o diagnóstico do Mapa junto do que você escreveu.");
+    });
+
+    // ===== Helpers de formatação (transforma texto em HTML bonito) =====
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function beautifyBody(text){
+      // converte linhas com "- " ou "• " em lista
+      const lines = String(text || "").split("\n");
+      const out = [];
+      let list = [];
+
+      function flushList(){
+        if (list.length){
+          out.push("<ul>" + list.map(li => "<li>" + escapeHtml(li) + "</li>").join("") + "</ul>");
+          list = [];
+        }
+      }
+
+      for (const raw of lines){
+        const l = raw.trim();
+        if (!l){ flushList(); continue; }
+
+        const bullet = l.match(/^[-•]\s+(.*)$/);
+        if (bullet){
+          list.push(bullet[1]);
+          continue;
+        }
+
+        flushList();
+
+        // destaca "Quando usar:" "Por quê:" etc
+        const keyMatch = l.match(/^(Quando usar|Por quê|Por que|Família|Preço|Orçamento|Clima|Ambiente)\s*:\s*(.*)$/i);
+        if (keyMatch){
+          out.push(`<p><span class="k">${escapeHtml(keyMatch[1])}:</span> ${escapeHtml(keyMatch[2])}</p>`);
+        } else {
+          out.push("<p>" + escapeHtml(l) + "</p>");
+        }
+      }
+      flushList();
+      return out.join("");
+    }
+
+    // ===== Parser em 3 cards =====
     function parseToCards(text) {
       const raw = (text || "").trim();
       if (!raw) return null;
 
-      // Pega título (primeira linha antes do "1)")
-      let title = "";
-      const idx = raw.search(/\n\s*1\)/);
-      if (idx > 0) title = raw.slice(0, idx).trim();
-      if (!title) title = "3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO";
-
-      // Divide em itens 1) 2) 3)
       const parts = raw.split(/\n\s*(?=\d\)\s+)/).map(s => s.trim()).filter(Boolean);
       const items = parts.filter(p => /^\d\)\s+/.test(p)).slice(0, 3);
 
-      if (items.length === 0) return { title, items: [{ n: 1, name: "Resposta", meta: "", body: raw }] };
+      if (items.length === 0) {
+        return {
+          title: "3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO",
+          items: [{ n: 1, name: "Resposta", meta: "", body: raw }]
+        };
+      }
 
       const cards = items.map((block) => {
         const m = block.match(/^(\d+)\)\s*([\s\S]*)$/);
         const n = m ? Number(m[1]) : 1;
         const content = (m ? m[2] : block).trim();
-
-        // Primeira linha = nome (até quebra de linha)
         const lines = content.split("\n").map(l => l.trim()).filter(Boolean);
-        const first = lines[0] || `Recomendação ${n}`;
 
-        // Tenta achar uma linha meta (com "•" ou " - " ou "R$")
+        const name = lines[0] || `Recomendação ${n}`;
+
         let meta = "";
-        for (const l of lines.slice(1, 5)) {
-          if (/[•\-]/.test(l) && /R\$|€|\$|c[ií]trico|amadeir|gourmand|aqu[aá]tico|floral|foug[eê]re|oriental|arom[aá]tico|frut/i.test(l)) {
+        for (const l of lines.slice(1, 6)) {
+          if (/R\$|c[ií]trico|amadeir|gourmand|aqu[aá]tico|floral|foug[eê]re|oriental|arom[aá]tico|frut/i.test(l)) {
             meta = l.replace(/^[-•]\s*/, "");
             break;
           }
         }
 
-        // Corpo = tudo menos a primeira linha e a meta, se existir
         let bodyLines = lines.slice(1);
         if (meta) bodyLines = bodyLines.filter(l => l.replace(/^[-•]\s*/, "") !== meta);
         const body = bodyLines.join("\n").trim();
 
-        return { n, name: first, meta, body };
+        return { n, name, meta, body };
       });
 
-      return { title, items: cards };
+      return { title: "3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO", items: cards };
     }
 
     function renderCards(parsed) {
-      clearCards();
-      clearError();
-
+      cardsEl.innerHTML = "";
       headerEl.style.display = "block";
       headerSubEl.textContent = "Baseado no seu diagnóstico e lacunas identificadas.";
 
@@ -401,7 +485,6 @@
       parsed.items.forEach((it) => {
         const card = document.createElement("div");
         card.className = "recCard";
-
         card.innerHTML = `
           <div class="recTop">
             <div class="num">${it.n}</div>
@@ -412,7 +495,7 @@
               </div>
             </div>
           </div>
-          ${it.body ? `<div class="body">${escapeHtml(it.body)}</div>` : ""}
+          ${it.body ? `<div class="body">${beautifyBody(it.body)}</div>` : ""}
         `;
         frag.appendChild(card);
       });
@@ -421,16 +504,7 @@
       sendHeightToParent();
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    async function run(prompt) {
+    async function callApi(finalPrompt) {
       clearError();
       setStatus("Consultando o Perfumista…");
       notifyParent("loading", { value: true });
@@ -441,14 +515,11 @@
         const r = await fetch(ENDPOINT_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
+          body: JSON.stringify({ prompt: finalPrompt })
         });
 
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) {
-          const msg = data?.error ? String(data.error) : ("HTTP " + r.status);
-          throw new Error(msg);
-        }
+        if (!r.ok) throw new Error(data?.error ? String(data.error) : ("HTTP " + r.status));
 
         const text = (data?.text || "").trim();
         if (!text) throw new Error("Resposta vazia da API.");
@@ -471,13 +542,34 @@
       }
     }
 
+    // clique "Gerar sugestões"
     sendBtn.addEventListener("click", async () => {
-      const prompt = (promptEl.value || "").trim();
-      if (!prompt) {
-        setStatus("Escreva ou cole algo no campo acima.");
+      const userText = (promptEl.value || "").trim();
+
+      // se o usuário não digitar nada, mas tiver diagnóstico do mapa, usa só o diagnóstico
+      let finalPrompt = "";
+      if (!userText && DIAG_CONTEXT) {
+        finalPrompt = DIAG_CONTEXT;
+      } else if (userText && DIAG_CONTEXT) {
+        // junta contexto + pedido novo (sem poluir textarea)
+        finalPrompt =
+          "DIAGNÓSTICO (contexto):\n" + DIAG_CONTEXT +
+          "\n\nPEDIDO (agora):\n" + userText;
+      } else {
+        finalPrompt = userText;
+      }
+
+      if (!finalPrompt.trim()) {
+        setStatus("Digite sua situação ou use um diagnóstico do Mapa.");
+        promptEl.focus();
         return;
       }
-      await run(prompt);
+
+      await callApi(finalPrompt);
+
+      // mantém textarea em branco depois de responder (pra incentivar novo pedido)
+      promptEl.value = "";
+      sendHeightToParent();
     });
 
     // ===== Receber comando do Mapa via iframe =====
@@ -490,9 +582,13 @@
       const texto = (data.text || "").trim();
       if (!texto) return;
 
-      // Preenche e executa automaticamente
-      promptEl.value = texto;
-      await run(texto);
+      // guarda como contexto e executa automaticamente, sem “colar” na caixa de digitar
+      showContextBox(texto);
+      await callApi(texto);
+
+      // textarea fica em branco sempre
+      promptEl.value = "";
+      sendHeightToParent();
     });
   </script>
 </body>
