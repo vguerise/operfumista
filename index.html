@@ -54,6 +54,7 @@ h1{
 }
 .rec b{color:var(--gold)}
 .rec ul{margin:8px 0 0 18px;color:var(--muted)}
+
 textarea{
   width:100%;
   min-height:110px;
@@ -63,7 +64,14 @@ textarea{
   border:1px solid rgba(255,255,255,.15);
   border-radius:12px;
   padding:12px;
+  font-size:16px;              /* +2px */
 }
+
+textarea::placeholder{
+  color:#fff;                 /* branco */
+  opacity:0.85;
+}
+
 button{
   margin-top:10px;
   padding:12px 18px;
@@ -86,14 +94,17 @@ button{
     <div id="status">Pronto.</div>
     <div id="cards"></div>
 
-    <textarea id="prompt" placeholder="Quer mais alguma recomendação?"></textarea>
+    <textarea
+      id="prompt"
+      placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa!"></textarea>
+
     <button id="sendBtn">Gerar</button>
   </div>
 </div>
 
 <script>
 const API = "https://operfumista-api.vercel.app/api/perfumista";
-const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup"; // ✅ NOVO
+const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup";
 const MAPA_ORIGIN = "https://vguerise.github.io";
 
 let contextoMapa="";
@@ -116,16 +127,28 @@ function resize(){
   }
 }
 
-/* 🟡 WARM-UP (corrigido: não chama OpenAI) */
 function warmupPerfumista(){
   try{
     fetch(WARMUP_URL, { method:"GET" }).catch(()=>{});
   }catch(e){}
 }
 
+/* 🔥 Comunicação com o Mapa (popup) */
+function notifyParent(type, extra = {}){
+  if(window.parent!==window){
+    window.parent.postMessage(
+      Object.assign({ source:"operfumista", type }, extra),
+      MAPA_ORIGIN
+    );
+  }
+}
+
 async function chamarIA(text){
   if(!text.trim()) return;
+
+  notifyParent("loading");
   setStatus("Consultando o Perfumista…");
+
   try{
     const r = await fetch(API,{
       method:"POST",
@@ -137,9 +160,11 @@ async function chamarIA(text){
 
     render(data);
     setStatus("Pronto.");
+    notifyParent("done");
   }catch(e){
     cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
     setStatus("Erro.");
+    notifyParent("error", { message: e.message });
   }
   resize();
 }
@@ -175,7 +200,6 @@ window.addEventListener("message",e=>{
   }
 });
 
-/* 🟡 AQUI chamamos o warm-up */
 window.addEventListener("load", ()=>{
   warmupPerfumista();
   resize();
