@@ -15,21 +15,37 @@
   --text:rgba(255,255,255,.92);
   --muted:rgba(255,255,255,.68);
 }
+*{box-sizing:border-box}
 body{
   margin:0;
-  background:linear-gradient(#0b0b0c,#000);
-  color:var(--text);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  padding:28px;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,.18), transparent 55%),
+    radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,.10), transparent 55%),
+    linear-gradient(#0b0b0c,#0a0a0a);
+  min-height:100vh;
+  padding:28px 16px;
 }
-.container{max-width:900px;margin:auto}
-h1{text-align:center;color:var(--gold);letter-spacing:3px}
+.container{max-width:980px;margin:auto}
+h1{
+  text-align:center;
+  color:var(--gold);
+  letter-spacing:3px;
+}
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-top:6px;
+}
 .card{
-  background:var(--card);
+  margin-top:20px;
   border:1px solid var(--stroke2);
+  background:var(--card);
   border-radius:18px;
   padding:20px;
 }
+#status{opacity:.7;margin-bottom:10px}
 .rec{
   border:1px solid var(--stroke);
   border-radius:14px;
@@ -37,15 +53,16 @@ h1{text-align:center;color:var(--gold);letter-spacing:3px}
   margin-top:12px;
 }
 .rec b{color:var(--gold)}
+.rec ul{margin:8px 0 0 18px;color:var(--muted)}
 textarea{
   width:100%;
-  min-height:120px;
+  min-height:110px;
+  margin-top:12px;
   background:#000;
   color:white;
   border:1px solid rgba(255,255,255,.15);
   border-radius:12px;
   padding:12px;
-  margin-top:12px;
 }
 button{
   margin-top:10px;
@@ -53,32 +70,32 @@ button{
   border:none;
   border-radius:12px;
   background:var(--gold);
-  color:black;
+  color:#000;
   font-weight:700;
   cursor:pointer;
 }
-#status{opacity:.7;margin-bottom:10px}
 </style>
 </head>
 
 <body>
 <div class="container">
-<h1>O PERFUMISTA</h1>
+  <h1>O PERFUMISTA</h1>
+  <div class="subtitle">Recomendações personalizadas</div>
 
-<div class="card">
-  <div id="status">Pronto.</div>
-  <div id="cards"></div>
+  <div class="card">
+    <div id="status">Pronto.</div>
+    <div id="cards"></div>
 
-  <textarea id="prompt" placeholder="Quer outra recomendação?"></textarea>
-  <button id="sendBtn">Gerar</button>
-</div>
+    <textarea id="prompt" placeholder="Quer mais alguma recomendação?"></textarea>
+    <button id="sendBtn">Gerar</button>
+  </div>
 </div>
 
 <script>
 const API = "https://operfumista-api.vercel.app/api/perfumista";
 const MAPA_ORIGIN = "https://vguerise.github.io";
 
-let contexto="";
+let contextoMapa="";
 
 const cards = document.getElementById("cards");
 const status = document.getElementById("status");
@@ -89,14 +106,13 @@ function setStatus(t){
   status.textContent=t;
   resize();
 }
-
 function resize(){
   if(window.parent!==window){
     window.parent.postMessage({source:"operfumista",type:"height",height:document.body.scrollHeight},MAPA_ORIGIN);
   }
 }
 
-async function callAI(text){
+async function chamarIA(text){
   if(!text.trim()) return;
   setStatus("Consultando o Perfumista…");
   try{
@@ -107,10 +123,11 @@ async function callAI(text){
     });
     const data = await r.json();
     if(!r.ok) throw new Error(data.error||"Erro");
+
     render(data);
     setStatus("Pronto.");
   }catch(e){
-    cards.innerHTML=`<div class="rec">Erro: ${e.message}</div>`;
+    cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
     setStatus("Erro.");
   }
   resize();
@@ -118,29 +135,32 @@ async function callAI(text){
 
 function render(data){
   cards.innerHTML="";
-  data.recomendacoes.forEach(r=>{
+  data.recomendacoes.forEach((r)=>{
     const d=document.createElement("div");
     d.className="rec";
-    d.innerHTML=`<b>${r.nome}</b><ul>
-      <li>${r.por_que}</li>
-      <li>${r.quando_usar}</li>
-      <li>${r.familia} • ${r.faixa_preco}</li>
-    </ul>`;
+    d.innerHTML=`
+      <b>${r.nome}</b>
+      <ul>
+        <li>${r.por_que}</li>
+        <li>${r.quando_usar}</li>
+        <li>${r.familia} • ${r.faixa_preco}</li>
+      </ul>
+    `;
     cards.appendChild(d);
   });
 }
 
 btn.onclick=()=>{
-  const t = contexto? contexto+"\n"+prompt.value:prompt.value;
-  callAI(t);
+  const t = contextoMapa? contextoMapa+"\n"+prompt.value:prompt.value;
+  chamarIA(t);
   prompt.value="";
 };
 
 window.addEventListener("message",e=>{
   if(e.origin!==MAPA_ORIGIN) return;
   if(e.data?.source==="mapa"){
-    contexto=e.data.text||"";
-    callAI(contexto);
+    contextoMapa = e.data.text || "";
+    chamarIA(contextoMapa);
   }
 });
 
