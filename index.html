@@ -51,6 +51,21 @@ function pickPayload(data){
   return { diagnostico, familias_percentuais, recomendacoes };
 }
 
+
+window.addEventListener('message', async (event) => {
+  const d = event.data || {};
+  if (!d || d.source !== 'mapa' || d.type !== 'run') return;
+  const p = (d.prompt || '').toString();
+  if (p) {
+    document.getElementById('prompt').value = p;
+  }
+  if (d.auto) {
+    document.getElementById('btn').click();
+  } else {
+    sendHeight();
+  }
+});
+
 document.getElementById('btn').addEventListener('click', async () => {
   const status = document.getElementById('status');
   const prompt = (document.getElementById('prompt').value || '').trim();
