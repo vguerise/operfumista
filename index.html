@@ -42,11 +42,31 @@ window.addEventListener('message', async (e)=>{
 async function consultarAgente(prompt, extra){
   const res = document.getElementById('results');
   res.innerHTML = '<div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div><div class="sub">Consultando Perfumista...</div>';
+
   const body = extra ? {prompt, extra} : {prompt};
-  const r = await fetch('/api/perfumista',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const j = await r.json();
-  render(j.text || j.top3 || j);
+
+  try{
+    const r = await fetch('/api/perfumista',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+
+    const j = await r.json();
+    render(j.text || j.top3 || j);
+
+    // avisa o mapa pai para fechar o popup
+    try{
+      window.parent.postMessage({source:'perfumista_iframe', type:'IA_DONE'}, '*');
+    }catch(e){}
+  }catch(err){
+    res.innerHTML = '<div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div><div class="sub">Erro ao consultar. Tente novamente.</div>';
+    try{
+      window.parent.postMessage({source:'perfumista_iframe', type:'IA_ERROR'}, '*');
+    }catch(e){}
+  }
 }
+
 
 function render(text){
   const lines = Array.isArray(text)?text:text.split(/\n+/).filter(l=>l.trim());
