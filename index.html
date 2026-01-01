@@ -50,13 +50,13 @@ h1{
   border:1px solid var(--stroke);
   border-radius:14px;
   padding:14px;
-  margin-top:12px;
+  margin-top:8px;
 }
 .rec b{color:var(--gold)}
 .rec ul{margin:8px 0 0 18px;color:var(--muted)}
 textarea{
   width:100%;
-  min-height:110px;
+  min-height:70px;
   margin-top:12px;
   background:#000;
   color:white;
@@ -79,16 +79,8 @@ button{
   cursor:pointer;
 }
 
-@keyframes newGlow {
-  0% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
-  30% { box-shadow: 0 0 22px rgba(212,175,55,0.55); transform: translateY(-2px); }
-  100% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
-}
-.rec.fresh{
-  animation:newGlow 1s ease-out 1;
-  border-color: rgba(212,175,55,0.9);
-}
-
+/* Mantém o iframe clean: cards aparecem no Mapa Pai */
+#cards{display:none !important;}
 </style>
 </head>
 
@@ -102,10 +94,7 @@ button{
     <div id="cards"></div>
 
     <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa!"></textarea>
-    <div style="display:flex; gap:12px; align-items:center;">
-<button id="sendBtn">Gerar</button>
-<button id="openChatGPT" style="background:#2b2b2b;color:#fff;border:1px solid rgba(212,175,55,.4);">Abrir no ChatGPT</button>
-</div>
+    <button id="sendBtn">Gerar</button>
   </div>
 </div>
 
@@ -162,7 +151,6 @@ setStatus("Consultando o Perfumista…");
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({diagnostico:text,prompt:text})
     });
-  applyGlow();
     const data = await r.json();
     if(!r.ok) throw new Error(data.error||"Erro");
 
@@ -179,33 +167,69 @@ setStatus("Consultando o Perfumista…");
   resize();
 }
 
-
-const chatBtn = document.getElementById("openChatGPT");
-chatBtn.onclick=()=>{ window.open("https://chatgpt.com", "_blank"); };
-
-function applyGlow(){
-  const recs = Array.from(document.querySelectorAll(".rec"));
-  recs.forEach(r=>r.classList.remove("fresh"));
-  recs.slice(-3).forEach(r=>r.classList.add("fresh"));
-  setTimeout(()=>{ document.querySelectorAll(".rec.fresh").forEach(r=>r.classList.remove("fresh")); },1100);
-}
-
 function render(data){
-  cards.innerHTML="";
-  data.recomendacoes.forEach((r)=>{
-    const d=document.createElement("div");
-    d.className="rec";
-    d.innerHTML=`
-      <b>${r.nome}</b>
-      <ul>
-        <li>${r.por_que}</li>
-        <li>${r.quando_usar}</li>
-        <li>${r.familia} • ${r.faixa_preco}</li>
-      </ul>
-    `;
-    cards.appendChild(d);
-  });
-  applyGlow();
+  // Esconde os cards no iframe (UI fica “silenciosa” — o mapa pai renderiza tudo)
+  cards.innerHTML = "";
+
+  const recomendacoes = Array.isArray(data?.recomendacoes) ? data.recomendacoes : [];
+
+  // famílias podem vir em snake_case (API nova) ou no formato antigo
+  const famIn = data?.familias_percentuais || data?.familias || null;
+  let familias = famIn;
+
+  if (famIn && typeof famIn === 'object') {
+    // detecta formato novo (snake_case)
+    const hasNewKeys = ('fresco_citrico' in famIn) || ('doce_gourmand' in famIn) || ('talco_fougere' in famIn);
+    if (hasNewKeys) {
+      familias = {
+        fresco: famIn.fresco_citrico ?? 0,
+        amadeirado: famIn.amadeirado ?? 0,
+        doce: famIn.doce_gourmand ?? 0,
+        especiado: famIn.especiado_oriental ?? 0,
+        aquatico: famIn.aquatico ?? 0,
+        aromatico: famIn.aromatico_verde ?? 0,
+        floral: famIn.floral ?? 0,
+        frutas: famIn.frutado ?? 0,
+        talco: famIn.talco_fougere ?? 0
+      };
+    }
+  }
+
+  // tenta achar diagnóstico em campos comuns (depende do que o backend retornar)
+  const diagnostico =
+    data?.diagnostico ||
+    data?.analise ||
+    data?.diagnostico_colecao ||
+    null;
+
+  // ✅ payload “premium” único
+  try{
+    window.parent.postMessage(
+      {
+        source: "operfumista",
+        type: "analysis",
+        payload: { diagnostico, familias, recomendacoes }
+      },
+      MAPA_ORIGIN
+    );
+  }catch(e){}
+
+  // ✅ compatibilidade com o mapa atual
+  try{
+    window.parent.postMessage(
+      { source: "operfumista", type: "recs", recomendacoes },
+      MAPA_ORIGIN
+    );
+  }catch(e){}
+
+  if (familias){
+    try{
+      window.parent.postMessage(
+        { source: "operfumista", type: "familias_radar", values: familias },
+        MAPA_ORIGIN
+      );
+    }catch(e){}
+  }
 }
 
 btn.onclick=()=>{
