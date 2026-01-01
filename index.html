@@ -24,6 +24,18 @@ button{margin-top:8px;width:100%;padding:10px 12px;border-radius:12px;border:1px
 <script>
 const API = 'https://operfumista-api.vercel.app/api/perfumista';
 const WARMUP_URL = 'https://operfumista-api.vercel.app/api/warmup';
+
+// recebe comandos do mapa (opção B)
+window.addEventListener('message', (event) => {
+  const d = event.data || {};
+  if (d && d.source === 'mapa' && d.type === 'run') {
+    const p = String(d.prompt || '');
+    const ta = document.getElementById('prompt');
+    if (ta) ta.value = p;
+    const btn = document.getElementById('btn');
+    if (btn) btn.click();
+  }
+});
 const MAPA_ORIGIN = 'https://vguerise.github.io';
 
 function sendHeight(){
@@ -48,7 +60,7 @@ function pickPayload(data){
   const diagnostico = d.diagnostico || d.analise || d.diagnostico_colecao || null;
   const familias_percentuais = d.familias_percentuais || d.familias || null;
   const recomendacoes = Array.isArray(d.recomendacoes) ? d.recomendacoes : [];
-  return { diagnostico, familias_percentuais, recomendacoes };
+  return { diagnostico, familias_percentuais, recomendacoes, raw: d };
 }
 
 
