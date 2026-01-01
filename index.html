@@ -81,6 +81,9 @@ button{
 
 /* Mantém o iframe clean: cards aparecem no Mapa Pai */
 #cards{display:none !important;}
+
+body{min-height:auto !important;}
+#cards{display:none !important;}
 </style>
 </head>
 
@@ -101,6 +104,19 @@ button{
 <script>
 const API = "https://operfumista-api.vercel.app/api/perfumista";
 const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup"; // ✅ NOVO
+
+function sendHeight(){
+  try{
+    const h = Math.max(
+      document.documentElement.scrollHeight || 0,
+      document.body.scrollHeight || 0
+    );
+    window.parent.postMessage({ source:'operfumista', type:'resize', height: h }, MAPA_ORIGIN);
+  }catch(e){}
+}
+window.addEventListener('load', () => setTimeout(sendHeight, 30));
+window.addEventListener('resize', () => setTimeout(sendHeight, 30));
+
 const MAPA_ORIGIN = "https://vguerise.github.io";
 
 let contextoMapa="";
@@ -213,6 +229,9 @@ function render(data){
       MAPA_ORIGIN
     );
   }catch(e){}
+
+  // Ajusta altura do iframe
+  sendHeight();
 
   // ✅ compatibilidade com o mapa atual
   try{
