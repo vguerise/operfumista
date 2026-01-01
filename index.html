@@ -79,16 +79,8 @@ button{
   cursor:pointer;
 }
 
-@keyframes newGlow {
-  0% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
-  30% { box-shadow: 0 0 22px rgba(212,175,55,0.55); transform: translateY(-2px); }
-  100% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
-}
-.rec.fresh{
-  animation:newGlow 1s ease-out 1;
-  border-color: rgba(212,175,55,0.9);
-}
-
+/* Mantém o iframe clean: cards aparecem no Mapa Pai */
+#cards{display:none !important;}
 </style>
 </head>
 
@@ -102,10 +94,7 @@ button{
     <div id="cards"></div>
 
     <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa!"></textarea>
-    <div style="display:flex; gap:12px; align-items:center;">
-<button id="sendBtn">Gerar</button>
-<button id="openChatGPT" style="background:#2b2b2b;color:#fff;border:1px solid rgba(212,175,55,.4);">Abrir no ChatGPT</button>
-</div>
+    <button id="sendBtn">Gerar</button>
   </div>
 </div>
 
@@ -162,7 +151,6 @@ setStatus("Consultando o Perfumista…");
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({diagnostico:text,prompt:text})
     });
-  applyGlow();
     const data = await r.json();
     if(!r.ok) throw new Error(data.error||"Erro");
 
@@ -179,33 +167,30 @@ setStatus("Consultando o Perfumista…");
   resize();
 }
 
-
-const chatBtn = document.getElementById("openChatGPT");
-chatBtn.onclick=()=>{ window.open("https://chatgpt.com", "_blank"); };
-
-function applyGlow(){
-  const recs = Array.from(document.querySelectorAll(".rec"));
-  recs.forEach(r=>r.classList.remove("fresh"));
-  recs.slice(-3).forEach(r=>r.classList.add("fresh"));
-  setTimeout(()=>{ document.querySelectorAll(".rec.fresh").forEach(r=>r.classList.remove("fresh")); },1100);
-}
-
 function render(data){
-  cards.innerHTML="";
-  data.recomendacoes.forEach((r)=>{
-    const d=document.createElement("div");
-    d.className="rec";
-    d.innerHTML=`
-      <b>${r.nome}</b>
-      <ul>
-        <li>${r.por_que}</li>
-        <li>${r.quando_usar}</li>
-        <li>${r.familia} • ${r.faixa_preco}</li>
-      </ul>
-    `;
-    cards.appendChild(d);
-  });
-  applyGlow();
+  // Esconde os cards no iframe (UI fica no Mapa Pai)
+  cards.innerHTML = "";
+
+  const recomendacoes = Array.isArray(data?.recomendacoes) ? data.recomendacoes : [];
+  const familias = data?.familias_percentuais || data?.familias || null;
+
+  // Envia recomendações para o Mapa Pai renderizar no layout premium
+  try{
+    window.parent.postMessage(
+      { source: "operfumista", type: "recs", recomendacoes },
+      MAPA_ORIGIN
+    );
+  }catch(e){}
+
+  // Envia distribuição de famílias (para o radar/spider no Mapa Pai)
+  if(familias){
+    try{
+      window.parent.postMessage(
+        { source: "operfumista", type: "familias_radar", values: familias },
+        MAPA_ORIGIN
+      );
+    }catch(e){}
+  }
 }
 
 btn.onclick=()=>{
