@@ -1,119 +1,231 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>O Perfumista (Motor)</title>
+<meta charset="UTF-8">
+<title>O Perfumista</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-:root{ --gold:#d4af37; --bg:#0b0b0c; --stroke:rgba(212,175,55,.22); --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.68); }
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
-.wrap{padding:10px;}
-textarea{width:100%;min-height:76px;max-height:170px;resize:vertical;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);color:var(--text);padding:10px;outline:none;}
-textarea::placeholder{color:rgba(255,255,255,.45);}
-button{margin-top:8px;width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(212,175,55,.35);background:rgba(0,0,0,.25);color:var(--gold);font-weight:900;cursor:pointer;}
-#status{margin-top:8px;font-size:12px;color:var(--muted);}
+:root{
+  --gold:#d4af37;
+  --bg:#0b0b0c;
+  --card:rgba(0,0,0,.32);
+  --stroke:rgba(212,175,55,.18);
+  --stroke2:rgba(212,175,55,.28);
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.68);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,.18), transparent 55%),
+    radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,.10), transparent 55%),
+    linear-gradient(#0b0b0c,#0a0a0a);
+  min-height:100vh;
+  padding:28px 16px;
+}
+.container{max-width:980px;margin:auto}
+h1{
+  text-align:center;
+  color:var(--gold);
+  letter-spacing:3px;
+}
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-top:6px;
+}
+.card{
+  margin-top:20px;
+  border:1px solid var(--stroke2);
+  background:var(--card);
+  border-radius:18px;
+  padding:20px;
+}
+#status{opacity:.7;margin-bottom:10px}
+.rec{
+  border:1px solid var(--stroke);
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
+}
+.rec b{color:var(--gold)}
+.rec ul{margin:8px 0 0 18px;color:var(--muted)}
+textarea{
+  width:100%;
+  min-height:110px;
+  margin-top:12px;
+  background:#000;
+  color:white;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;
+  padding:12px;
+  font-size:16px;
+}
+
+textarea::placeholder{color:#fff;opacity:0.85;}
+
+button{
+  margin-top:10px;
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  background:var(--gold);
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+}
+
+@keyframes newGlow {
+  0% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
+  30% { box-shadow: 0 0 22px rgba(212,175,55,0.55); transform: translateY(-2px); }
+  100% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
+}
+.rec.fresh{
+  animation:newGlow 1s ease-out 1;
+  border-color: rgba(212,175,55,0.9);
+}
+
 </style>
 </head>
+
 <body>
-<div class="wrap">
-  <textarea id="prompt" placeholder="Descreva o que você quer (ex.: 'quero fechar lacunas da coleção para trabalho em clima quente')"></textarea>
-  <button id="btn">Gerar</button>
-  <div id="status"></div>
+<div class="container">
+  <h1>O PERFUMISTA</h1>
+  <div class="subtitle">Recomendações personalizadas</div>
+
+  <div class="card">
+    <div id="status">Pronto.</div>
+    <div id="cards"></div>
+
+    <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa!"></textarea>
+    <div style="display:flex; gap:12px; align-items:center;">
+<button id="sendBtn">Gerar</button>
+<button id="openChatGPT" style="background:#2b2b2b;color:#fff;border:1px solid rgba(212,175,55,.4);">Abrir no ChatGPT</button>
+</div>
+  </div>
 </div>
 
 <script>
-const API = 'https://operfumista-api.vercel.app/api/perfumista';
-const WARMUP_URL = 'https://operfumista-api.vercel.app/api/warmup';
+const API = "https://operfumista-api.vercel.app/api/perfumista";
+const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup"; // ✅ NOVO
+const MAPA_ORIGIN = "https://vguerise.github.io";
 
-// recebe comandos do mapa (opção B)
-window.addEventListener('message', (event) => {
-  const d = event.data || {};
-  if (d && d.source === 'mapa' && d.type === 'run') {
-    const p = String(d.prompt || '');
-    const ta = document.getElementById('prompt');
-    if (ta) ta.value = p;
-    const btn = document.getElementById('btn');
-    if (btn) btn.click();
-  }
-});
-const MAPA_ORIGIN = 'https://vguerise.github.io';
+let contextoMapa="";
 
-function sendHeight(){
-  try {
-    const h = Math.max(document.documentElement.scrollHeight||0, document.body.scrollHeight||0);
-    window.parent.postMessage({ source:'operfumista', type:'resize', height:h }, MAPA_ORIGIN);
-  } catch(e){}
+const cards = document.getElementById("cards");
+const status = document.getElementById("status");
+const prompt = document.getElementById("prompt");
+const btn = document.getElementById("sendBtn");
+
+function setStatus(t){
+  status.textContent=t;
+  resize();
 }
-
-window.addEventListener('load', () => setTimeout(sendHeight, 40));
-window.addEventListener('resize', () => setTimeout(sendHeight, 40));
-
-async function warmup(){
-  try { await fetch(WARMUP_URL, { method:'GET', mode:'cors' }); } catch(e){}
-}
-
-function safeJSON(x){ return (x && typeof x === 'object') ? x : {}; }
-
-function pickPayload(data){
-  const d = safeJSON(data);
-  // Aceita tanto o formato novo (snake_case) quanto alias antigos
-  const diagnostico = d.diagnostico || d.analise || d.diagnostico_colecao || null;
-  const familias_percentuais = d.familias_percentuais || d.familias || null;
-  const recomendacoes = Array.isArray(d.recomendacoes) ? d.recomendacoes : [];
-  return { diagnostico, familias_percentuais, recomendacoes, raw: d };
-}
-
-
-window.addEventListener('message', async (event) => {
-  const d = event.data || {};
-  if (!d || d.source !== 'mapa' || d.type !== 'run') return;
-  const p = (d.prompt || '').toString();
-  if (p) {
-    document.getElementById('prompt').value = p;
-  }
-  if (d.auto) {
-    document.getElementById('btn').click();
-  } else {
-    sendHeight();
-  }
-});
-
-document.getElementById('btn').addEventListener('click', async () => {
-  const status = document.getElementById('status');
-  const prompt = (document.getElementById('prompt').value || '').trim();
-  status.textContent = 'Consultando…';
-  sendHeight();
-  await warmup();
-
-  try {
-    const r = await fetch(API, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-
-    const data = await r.json();
-    const payload = pickPayload(data);
-
-    // ✅ opção B: iframe só manda JSON; mapa renderiza
+function resize(){
+  if(window.parent!==window){
     window.parent.postMessage(
-      { source:'operfumista', type:'analysis', payload },
+      {source:"operfumista",type:"height",height:document.body.scrollHeight},
       MAPA_ORIGIN
     );
-
-    status.textContent = 'Pronto.';
-  } catch (e) {
-    status.textContent = 'Erro ao consultar a API.';
-    try {
-      window.parent.postMessage(
-        { source:'operfumista', type:'analysis', payload: { diagnostico:null, familias_percentuais:null, recomendacoes:[], error:String(e) } },
-        MAPA_ORIGIN
-      );
-    } catch(_) {}
-  } finally {
-    setTimeout(sendHeight, 60);
   }
+}
+
+/* 🟡 WARM-UP (corrigido: não chama OpenAI) */
+
+function notifyParent(type, extra = {}){
+  if(window.parent!==window){
+    window.parent.postMessage(
+      Object.assign({ source:"operfumista", type }, extra),
+      MAPA_ORIGIN
+    );
+  }
+}
+
+function warmupPerfumista(){
+  try{
+    fetch(WARMUP_URL, { method:"GET" }).catch(()=>{});
+  }catch(e){}
+}
+
+async function chamarIA(text){
+  if(!text.trim()) return;
+  
+  notifyParent("loading");
+setStatus("Consultando o Perfumista…");
+  try{
+    const r = await fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({diagnostico:text,prompt:text})
+    });
+  applyGlow();
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.error||"Erro");
+
+    render(data);
+    setStatus("Pronto.");
+  
+    notifyParent("done");
+}catch(e){
+    cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
+    setStatus("Erro.");
+  
+    notifyParent("error", { message: e.message });
+}
+  resize();
+}
+
+
+const chatBtn = document.getElementById("openChatGPT");
+chatBtn.onclick=()=>{ window.open("https://chatgpt.com", "_blank"); };
+
+function applyGlow(){
+  const recs = Array.from(document.querySelectorAll(".rec"));
+  recs.forEach(r=>r.classList.remove("fresh"));
+  recs.slice(-3).forEach(r=>r.classList.add("fresh"));
+  setTimeout(()=>{ document.querySelectorAll(".rec.fresh").forEach(r=>r.classList.remove("fresh")); },1100);
+}
+
+function render(data){
+  cards.innerHTML="";
+  data.recomendacoes.forEach((r)=>{
+    const d=document.createElement("div");
+    d.className="rec";
+    d.innerHTML=`
+      <b>${r.nome}</b>
+      <ul>
+        <li>${r.por_que}</li>
+        <li>${r.quando_usar}</li>
+        <li>${r.familia} • ${r.faixa_preco}</li>
+      </ul>
+    `;
+    cards.appendChild(d);
+  });
+  applyGlow();
+}
+
+btn.onclick=()=>{
+  const t = contextoMapa? contextoMapa+"\n"+prompt.value:prompt.value;
+  chamarIA(t);
+  prompt.value="";
+};
+
+window.addEventListener("message",e=>{
+  if(e.origin!==MAPA_ORIGIN) return;
+  if(e.data?.source==="mapa"){
+    contextoMapa = e.data.text || "";
+    chamarIA(contextoMapa);
+  }
+});
+
+/* 🟡 AQUI chamamos o warm-up */
+window.addEventListener("load", ()=>{
+  warmupPerfumista();
+  resize();
 });
 </script>
 </body>
