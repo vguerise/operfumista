@@ -5,86 +5,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Motor do Mapa – Perfumista</title>
 <style>
-body{margin:0;font-family:Inter,system-ui;background:#2f2f2f;color:#eee}
-.container{padding:16px}
-.card{border:2px solid #d4b24c;border-radius:14px;padding:16px;background:linear-gradient(180deg,#5a5546,#3b382f)}
-.h1{color:#d4b24c;font-weight:700;font-size:20px;text-align:center}
-.sub{color:#bfbfbf;text-align:center;margin-bottom:12px}
-.item{background:#2a2924;border-radius:12px;padding:12px;margin:10px 0;border-left:4px solid #d4b24c}
-.item h3{margin:0;color:#d4b24c;font-size:16px}
-.chat{margin-top:12px}
-textarea{width:100%;min-height:60px;border-radius:8px;border:none;padding:8px}
-button{margin-top:6px;width:100%;padding:10px;border:none;border-radius:8px;background:#d4b24c;color:#2f2f2f;font-weight:700}
+  body{margin:0;font-family:Inter,system-ui;background:#2f2f2f;color:#eee}
+  .container{padding:16px}
+  .card{border:2px solid #d4b24c;border-radius:14px;padding:16px;background:linear-gradient(180deg,#5a5546,#3b382f)}
+  .h1{color:#d4b24c;font-weight:800;font-size:20px;text-align:center;letter-spacing:0.2px}
+  .sub{color:#bfbfbf;text-align:center;margin:10px 0 12px}
+  .item{background:#2a2924;border-radius:12px;padding:12px;margin:10px 0;border-left:4px solid #d4b24c}
+  .item h3{margin:0;color:#d4b24c;font-size:16px;line-height:1.25}
+  .hint{color:#cfcfcf;font-size:0.92em;line-height:1.35;margin-top:10px}
+  .chat{margin-top:12px}
+  textarea{width:100%;min-height:60px;border-radius:10px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06);color:#fff;padding:10px;outline:none}
+  button{margin-top:8px;width:100%;padding:11px;border:none;border-radius:10px;background:#d4b24c;color:#2f2f2f;font-weight:900;cursor:pointer}
+  .error{margin-top:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,120,120,0.5);background:rgba(255,80,80,0.12);color:#ffd3d3}
 </style>
 </head>
 <body>
 <div class="container">
   <div id="results" class="card">
     <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
-    <div class="sub">Aguardando dados do mapa...</div>
+    <div class="sub">Aguardando dados do mapa…</div>
+    <div class="hint">Assim que você clicar em <strong>Mapear Coleção!</strong>, o Top 3 aparece aqui.</div>
   </div>
 
   <div class="chat">
-    <textarea id="extra" placeholder="Precisa pedir algo a mais para a IA?"></textarea>
-    <button onclick="sendExtra()">Enviar ao Perfumista</button>
+    <textarea id="extra" placeholder="Precisa pedir algo a mais para a IA? (ex.: sem baunilha, mais noturno, etc.)"></textarea>
+    <button id="btnExtra" type="button">Enviar ao Perfumista</button>
   </div>
 </div>
 
 <script>
-let basePrompt = null;
+  let basePrompt = null;
+  const results = document.getElementById('results');
+  const btnExtra = document.getElementById('btnExtra');
 
-window.addEventListener('message', async (e)=>{
-  if(!e.data || e.data.type!=='MAPA_DADOS') return;
-  basePrompt = e.data.payload;
-  await consultarAgente(basePrompt, null);
-});
+  window.addEventListener('message', async (e)=>{
+    if(!e.data || e.data.type!=='MAPA_DADOS') return;
+    basePrompt = e.data.payload;
+    await consultarAgente(basePrompt, null);
+  });
 
-async function consultarAgente(prompt, extra){
-  const res = document.getElementById('results');
-  res.innerHTML = '<div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div><div class="sub">Consultando Perfumista...</div>';
+  btnExtra.addEventListener('click', ()=>{
+    if(!basePrompt) return;
+    const extra = document.getElementById('extra').value.trim();
+    consultarAgente(basePrompt, extra || null);
+  });
 
-  const body = extra ? {prompt, extra} : {prompt};
+  async function consultarAgente(prompt, extra){
+    renderLoading();
+    try{
+      const body = extra ? {prompt, extra} : {prompt};
+      const r = await fetch('/api/perfumista', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
 
-  try{
-    const r = await fetch('/api/perfumista',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(body)
+      if(!r.ok){
+        const t = await r.text();
+        renderError('Falha ao consultar /api/perfumista ('+r.status+').', t);
+        notifyDone(false);
+        return;
+      }
+
+      const j = await r.json();
+      const text = j.text || (Array.isArray(j.top3) ? j.top3.join('\n') : '') || '';
+      renderTop3(text);
+      notifyDone(true);
+    }catch(err){
+      renderError('Erro ao consultar o Perfumista.', String(err && err.message ? err.message : err));
+      notifyDone(false);
+    }
+  }
+
+  function renderLoading(){
+    results.innerHTML = `
+      <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
+      <div class="sub">Consultando Perfumista…</div>
+      <div class="hint">Aguarde — estou calculando o Top 3.</div>
+    `;
+  }
+
+  function normalizeLines(text){
+    const raw = String(text||'')
+      .replace(/\r/g,'')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
+
+    // remove numeração/bullets se vierem
+    const cleaned = raw.map(l => l.replace(/^[-•*\d\)\.\s]+/,'').trim()).filter(Boolean);
+    return cleaned.slice(0,3);
+  }
+
+  function renderTop3(text){
+    const lines = normalizeLines(text);
+    results.innerHTML = `
+      <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
+      <div class="sub">Baseado no seu clima, orçamento e lacunas identificadas</div>
+    `;
+
+    if(!lines.length){
+      results.innerHTML += `<div class="error">Não recebi recomendações válidas. Tente novamente.</div>`;
+      return;
+    }
+
+    lines.forEach((l,i)=>{
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `<h3>${i+1}. ${escapeHtml(l)}</h3>`;
+      results.appendChild(div);
     });
+  }
 
-    const j = await r.json();
-    render(j.text || j.top3 || j);
+  function renderError(title, detail){
+    results.innerHTML = `
+      <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
+      <div class="sub">Não consegui gerar o Top 3</div>
+      <div class="error"><strong>${escapeHtml(title)}</strong><br/>${escapeHtml(detail||'')}</div>
+    `;
+  }
 
-    // avisa o mapa pai para fechar o popup
+  function notifyDone(ok){
     try{
-      window.parent.postMessage({source:'perfumista_iframe', type:'IA_DONE'}, '*');
-    }catch(e){}
-  }catch(err){
-    res.innerHTML = '<div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div><div class="sub">Erro ao consultar. Tente novamente.</div>';
-    try{
-      window.parent.postMessage({source:'perfumista_iframe', type:'IA_ERROR'}, '*');
+      window.parent.postMessage({ type:'IA_DONE', ok: !!ok }, '*');
     }catch(e){}
   }
-}
 
-
-function render(text){
-  const lines = Array.isArray(text)?text:text.split(/\n+/).filter(l=>l.trim());
-  const res = document.getElementById('results');
-  res.innerHTML = '<div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div><div class="sub">Baseado no seu clima, orçamento e lacunas identificadas</div>';
-  lines.slice(0,3).forEach((l,i)=>{
-    const div=document.createElement('div');
-    div.className='item';
-    div.innerHTML = `<h3>${i+1}. ${l}</h3>`;
-    res.appendChild(div);
-  });
-}
-
-function sendExtra(){
-  if(!basePrompt) return;
-  const extra = document.getElementById('extra').value;
-  consultarAgente(basePrompt, extra);
-}
+  function escapeHtml(s){
+    return String(s||'')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
 </script>
 </body>
 </html>
