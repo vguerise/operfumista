@@ -1,183 +1,232 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Motor do Mapa – Perfumista (v6)</title>
+<meta charset="UTF-8">
+<title>O Perfumista</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-  body{margin:0;font-family:Inter,system-ui;background:#2f2f2f;color:#eee}
-  .container{padding:16px}
-  .card{border:2px solid #d4b24c;border-radius:14px;padding:16px;background:linear-gradient(180deg,#5a5546,#3b382f)}
-  .h1{color:#d4b24c;font-weight:800;font-size:20px;text-align:center;letter-spacing:0.2px}
-  .sub{color:#bfbfbf;text-align:center;margin:10px 0 12px}
-  .item{background:#2a2924;border-radius:12px;padding:12px;margin:10px 0;border-left:4px solid #d4b24c}
-  .item h3{margin:0;color:#d4b24c;font-size:16px;line-height:1.25}
-  .hint{color:#cfcfcf;font-size:0.92em;line-height:1.35;margin-top:10px}
-  .chat{margin-top:12px}
-  textarea{width:100%;min-height:60px;border-radius:10px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06);color:#fff;padding:10px;outline:none}
-  button{margin-top:8px;width:100%;padding:11px;border:none;border-radius:10px;background:#d4b24c;color:#2f2f2f;font-weight:900;cursor:pointer}
-  .error{margin-top:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,120,120,0.5);background:rgba(255,80,80,0.12);color:#ffd3d3}
-  .small{color:#bfbfbf;font-size:0.85em;margin-top:8px;word-break:break-word}
+:root{
+  --gold:#d4af37;
+  --bg:#0b0b0c;
+  --card:rgba(0,0,0,.32);
+  --stroke:rgba(212,175,55,.18);
+  --stroke2:rgba(212,175,55,.28);
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.68);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 50% -20%, rgba(212,175,55,.18), transparent 55%),
+    radial-gradient(900px 500px at 50% 120%, rgba(212,175,55,.10), transparent 55%),
+    linear-gradient(#0b0b0c,#0a0a0a);
+  min-height:100vh;
+  padding:28px 16px;
+}
+.container{max-width:980px;margin:auto}
+h1{
+  text-align:center;
+  color:var(--gold);
+  letter-spacing:3px;
+}
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-top:6px;
+}
+.card{
+  margin-top:20px;
+  border:1px solid var(--stroke2);
+  background:var(--card);
+  border-radius:18px;
+  padding:20px;
+}
+#status{opacity:.7;margin-bottom:10px}
+.rec{
+  border:1px solid var(--stroke);
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
+}
+.rec b{color:var(--gold)}
+.rec ul{margin:8px 0 0 18px;color:var(--muted)}
+textarea{
+  width:100%;
+  min-height:110px;
+  margin-top:12px;
+  background:#000;
+  color:white;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;
+  padding:12px;
+  font-size:16px;
+}
+
+textarea::placeholder{color:#fff;opacity:0.85;}
+
+button{
+  margin-top:10px;
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  background:var(--gold);
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+}
+
+@keyframes newGlow {
+  0% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
+  30% { box-shadow: 0 0 22px rgba(212,175,55,0.55); transform: translateY(-2px); }
+  100% { box-shadow: 0 0 0 rgba(212,175,55,0); transform: translateY(0); }
+}
+.rec.fresh{
+  animation:newGlow 1s ease-out 1;
+  border-color: rgba(212,175,55,0.9);
+}
+
 </style>
 </head>
+
 <body>
 <div class="container">
-  <div id="results" class="card">
-    <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
-    <div class="sub">Motor carregado. Aguardando dados do mapa…</div>
-    <div class="hint">Assim que você clicar em <strong>Mapear Coleção!</strong>, o Top 3 aparece aqui.</div>
-    <div class="small">Endpoint: https://operfumista-api.vercel.app/api/perfumista</div>
-    <div class="small" id="dbg">Status: pronto (IFRAME_READY enviado)</div>
-  </div>
+  <h1>O PERFUMISTA</h1>
+  <div class="subtitle">Recomendações personalizadas</div>
 
-  <div class="chat">
-    <textarea id="extra" placeholder="Precisa pedir algo a mais para a IA? (ex.: sem baunilha, mais noturno, etc.)"></textarea>
-    <button id="btnExtra" type="button">Enviar ao Perfumista</button>
+  <div class="card">
+    <div id="status">Pronto.</div>
+    <div id="cards"></div>
+
+    <textarea id="prompt" placeholder="Deseja mais alguma sugestão? Me diz a ocasião, o clima, se é ambiente fechado, ou até qual perfume inspirado você precisa!"></textarea>
+    <div style="display:flex; gap:12px; align-items:center;">
+<button id="sendBtn">Gerar</button>
+<button id="openChatGPT" style="background:#2b2b2b;color:#fff;border:1px solid rgba(212,175,55,.4);">Abrir no ChatGPT</button>
+</div>
   </div>
 </div>
 
 <script>
-  const API_URL = "https://operfumista-api.vercel.app/api/perfumista";
-  const results = document.getElementById("results");
-  const btnExtra = document.getElementById("btnExtra");
+const API = "https://operfumista-api.vercel.app/api/perfumista";
+const WARMUP_URL = "https://operfumista-api.vercel.app/api/warmup"; // ✅ NOVO
+const MAPA_ORIGIN = "https://vguerise.github.io";
 
-  function setDbg(msg){
-    const el = document.getElementById("dbg");
-    if(el) el.textContent = msg;
+let contextoMapa="";
+
+const cards = document.getElementById("cards");
+const status = document.getElementById("status");
+const prompt = document.getElementById("prompt");
+const btn = document.getElementById("sendBtn");
+
+function setStatus(t){
+  status.textContent=t;
+  resize();
+}
+function resize(){
+  if(window.parent!==window){
+    window.parent.postMessage(
+      {source:"operfumista",type:"height",height:document.body.scrollHeight},
+      MAPA_ORIGIN
+    );
   }
+}
 
-  let basePrompt = null;
+/* 🟡 WARM-UP (corrigido: não chama OpenAI) */
 
-  // Handshake: avisa o pai que o iframe está pronto
-  try {
-    window.parent.postMessage({ type:"IFRAME_READY", ts: Date.now() }, "*");
-  } catch(e) {}
-
-  window.addEventListener("message", async (e) => {
-    if(!e.data) return;
-
-    if(e.data.type === "PING") {
-      try { window.parent.postMessage({ type:"PONG", ts: Date.now() }, "*"); } catch(err) {}
-      return;
-    }
-
-    if(e.data.type !== "MAPA_DADOS") return;
-
-    basePrompt = e.data.payload;
-    setDbg("Status: MAPA_DADOS recebido (iniciando POST)");
-
-    // ACK para o pai (provar que recebeu)
-    try { window.parent.postMessage({ type:"IFRAME_ACK", ts: Date.now() }, "*"); } catch(err) {}
-
-    await consultarAgente(basePrompt, null);
-  });
-
-  btnExtra.addEventListener("click", () => {
-    if(!basePrompt) {
-      setDbg("Status: sem dados do mapa ainda (clique em Mapear Coleção!)");
-      return;
-    }
-    const extra = document.getElementById("extra").value.trim();
-    consultarAgente(basePrompt, extra || null);
-  });
-
-  async function consultarAgente(prompt, extra){
-    renderLoading();
-    try{
-      const body = extra ? { prompt, extra } : { prompt };
-      const r = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if(!r.ok){
-        const t = await r.text();
-        renderError("Falha ao consultar o Perfumista (" + r.status + ").", t);
-        notifyDone(false);
-        return;
-      }
-
-      const j = await r.json();
-      const text = j.text || (Array.isArray(j.top3) ? j.top3.join("\n") : "") || "";
-      renderTop3(text);
-      notifyDone(true);
-    }catch(err){
-      renderError("Erro ao consultar o Perfumista.", String(err && err.message ? err.message : err));
-      notifyDone(false);
-    }
+function notifyParent(type, extra = {}){
+  if(window.parent!==window){
+    window.parent.postMessage(
+      Object.assign({ source:"operfumista", type }, extra),
+      MAPA_ORIGIN
+    );
   }
+}
 
-  function renderLoading(){
-    results.innerHTML = `
-      <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
-      <div class="sub">Consultando Perfumista…</div>
-      <div class="hint">Aguarde — estou calculando o Top 3.</div>
-      <div class="small">Endpoint: ${API_URL}</div>
-      <div class="small" id="dbg">Status: POST em andamento…</div>
-    `;
-  }
+function warmupPerfumista(){
+  try{
+    fetch(WARMUP_URL, { method:"GET" }).catch(()=>{});
+  }catch(e){}
+}
 
-  function normalizeLines(text){
-    const raw = String(text||"")
-      .replace(/\r/g,"")
-      .split("\n")
-      .map(l => l.trim())
-      .filter(Boolean);
-
-    const cleaned = raw
-      .map(l => l.replace(/^[-•*\d\)\.\s]+/,"").trim())
-      .filter(Boolean);
-
-    return cleaned.slice(0,3);
-  }
-
-  function renderTop3(text){
-    const lines = normalizeLines(text);
-    results.innerHTML = `
-      <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
-      <div class="sub">Baseado no seu clima, orçamento e lacunas identificadas</div>
-      <div class="small">Endpoint: ${API_URL}</div>
-      <div class="small" id="dbg">Status: Top 3 renderizado (IA_DONE enviado)</div>
-    `;
-
-    if(!lines.length){
-      results.innerHTML += `<div class="error">Não recebi recomendações válidas. Tente novamente.</div>`;
-      return;
-    }
-
-    lines.forEach((l,i)=>{
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `<h3>${i+1}. ${escapeHtml(l)}</h3>`;
-      results.appendChild(div);
+async function chamarIA(text){
+  if(!text.trim()) return;
+  
+  notifyParent("loading");
+setStatus("Consultando o Perfumista…");
+  try{
+    const r = await fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({diagnostico:text,prompt:text})
     });
-  }
+  applyGlow();
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.error||"Erro");
 
-  function renderError(title, detail){
-    results.innerHTML = `
-      <div class="h1">🎁 3 RECOMENDAÇÕES PARA EQUILIBRAR SUA COLEÇÃO</div>
-      <div class="sub">Não consegui gerar o Top 3</div>
-      <div class="small">Endpoint: ${API_URL}</div>
-      <div class="error"><strong>${escapeHtml(title)}</strong><br/>${escapeHtml(detail||"")}</div>
-      <div class="small" id="dbg">Status: erro (IA_DONE enviado)</div>
+    render(data);
+    setStatus("Pronto.");
+  
+    notifyParent("done");
+}catch(e){
+    cards.innerHTML = `<div class="rec">Erro: ${e.message}</div>`;
+    setStatus("Erro.");
+  
+    notifyParent("error", { message: e.message });
+}
+  resize();
+}
+
+
+const chatBtn = document.getElementById("openChatGPT");
+chatBtn.onclick=()=>{ window.open("https://chatgpt.com", "_blank"); };
+
+function applyGlow(){
+  const recs = Array.from(document.querySelectorAll(".rec"));
+  recs.forEach(r=>r.classList.remove("fresh"));
+  recs.slice(-3).forEach(r=>r.classList.add("fresh"));
+  setTimeout(()=>{ document.querySelectorAll(".rec.fresh").forEach(r=>r.classList.remove("fresh")); },1100);
+}
+
+function render(data){
+  cards.innerHTML="";
+  data.recomendacoes.forEach((r)=>{
+    const d=document.createElement("div");
+    d.className="rec";
+    d.innerHTML=`
+      <b>${r.nome}</b>
+      <ul>
+        <li>${r.por_que}</li>
+        <li>${r.quando_usar}</li>
+        <li>${r.familia} • ${r.faixa_preco}</li>
+      </ul>
     `;
-  }
+    cards.appendChild(d);
+  });
+  applyGlow();
+}
 
-  function notifyDone(ok){
-    try {
-      window.parent.postMessage({ type:"IA_DONE", ok: !!ok, ts: Date.now() }, "*");
-    } catch(e) {}
-  }
+btn.onclick=()=>{
+  const t = contextoMapa? contextoMapa+"\n"+prompt.value:prompt.value;
+  chamarIA(t);
+  prompt.value="";
+};
 
-  function escapeHtml(s){
-    return String(s||"")
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#039;");
+window.addEventListener("message",e=>{
+  if(e.origin!==MAPA_ORIGIN) return;
+  if(e.data?.source==="mapa"){
+    contextoMapa = e.data.text || "";
+    chamarIA(contextoMapa);
   }
+});
+
+/* 🟡 AQUI chamamos o warm-up */
+window.addEventListener("load", ()=>{
+  warmupPerfumista();
+  resize();
+});
 </script>
 </body>
 </html>
